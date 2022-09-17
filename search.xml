@@ -4,6 +4,87 @@
   
     
     <entry>
+      <title>数仓基本概念</title>
+      <link href="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"/>
+      <url>/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/</url>
+      
+        <content type="html"><![CDATA[<h2 id="1-数仓分层"><a href="#1-数仓分层" class="headerlink" title="1. 数仓分层"></a>1. 数仓分层</h2><h3 id="1-1-为什么要进行分层"><a href="#1-1-为什么要进行分层" class="headerlink" title="1.1 为什么要进行分层"></a>1.1 为什么要进行分层</h3><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389045139.png" alt="1663389045139"></p><h3 id="1-2-数据集市和数据仓库的概念"><a href="#1-2-数据集市和数据仓库的概念" class="headerlink" title="1.2 数据集市和数据仓库的概念"></a>1.2 数据集市和数据仓库的概念</h3><p> <img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389137035.png" alt="1663389137035"></p><h3 id="1-3-数仓命名规范"><a href="#1-3-数仓命名规范" class="headerlink" title="1.3 数仓命名规范"></a>1.3 数仓命名规范</h3><h4 id="1-3-1-表格命名"><a href="#1-3-1-表格命名" class="headerlink" title="1.3.1 表格命名"></a>1.3.1 表格命名</h4><ul><li><p>ODS层命名为ods_表名</p></li><li><p>DIM层命名为dim_表名</p></li><li><p>DWD层命名为dwd_表名</p></li><li><p>DWS层命名为dws_表名  </p></li><li><p>DWT层命名为dwt_表名</p></li><li><p>ADS层命名为ads_表名</p></li><li><p>临时表命名为tmp_表名</p></li></ul><h4 id="1-3-2-脚本命名"><a href="#1-3-2-脚本命名" class="headerlink" title="1.3.2 脚本命名"></a>1.3.2 脚本命名</h4><ul><li><p>数据源_to_目标_db&#x2F;log.sh</p></li><li><p>用户行为脚本以log为后缀；业务数据脚本以db为后缀。</p></li></ul><h4 id="1-3-3-表格字段命名"><a href="#1-3-3-表格字段命名" class="headerlink" title="1.3.3 表格字段命名"></a>1.3.3 表格字段命名</h4><ul><li><p>数量类型为bigint</p></li><li><p>金额类型为decimal(16, 2)，表示：16位有效数字，其中小数部分2位</p></li><li><p>字符串(名字，描述信息等)类型为string</p></li><li><p>主键外键类型为string</p></li><li><p>时间戳类型为bigint</p></li></ul><h2 id="2-数仓理论"><a href="#2-数仓理论" class="headerlink" title="2. 数仓理论"></a>2. 数仓理论</h2><h3 id="2-1-关系建模和维度建模"><a href="#2-1-关系建模和维度建模" class="headerlink" title="2.1 关系建模和维度建模"></a>2.1 关系建模和维度建模</h3><p>​关系建模和维度建模是两种数据仓库的建模技术。关系建模由Bill Inmon所倡导，维度建模由Ralph Kimball所倡导。</p><h4 id="2-1-1-关系建模"><a href="#2-1-1-关系建模" class="headerlink" title="2.1.1 关系建模"></a>2.1.1 关系建模</h4><p>​关系建模将复杂的数据抽象为两个概念——实体和关系，并使用规范化的方式表示出来。关系模型如图所示，从图中可以看出，较为松散、零碎，物理表数量多。</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389432280.png" alt="1663389432280"></p><p>​关系模型严格遵循第三范式（3NF），数据冗余程度低，数据的一致性容易得到保证。由于数据分布于众多的表中，查询会相对复杂，在大数据的场景下，查询效率相对较低。</p><h4 id="2-1-2-维度建模"><a href="#2-1-2-维度建模" class="headerlink" title="2.1.2 维度建模"></a>2.1.2 维度建模</h4><p>​维度模型如图所示，从图中可以看出，模型相对清晰、简洁。</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389476701.png" alt="1663389476701"></p><p>​维度模型以数据分析作为出发点，不遵循三范式，故数据存在一定的冗余。维度模型面向业务，将业务用事实表和维度表呈现出来。表结构简单，故查询简单，查询效率较高。</p><h3 id="2-2-维度表和事实表"><a href="#2-2-维度表和事实表" class="headerlink" title="2.2 维度表和事实表"></a>2.2 维度表和事实表</h3><h4 id="2-2-1-维度表"><a href="#2-2-1-维度表" class="headerlink" title="2.2.1 维度表"></a>2.2.1 维度表</h4><p>​<strong>维度表</strong>：一般是对事实的<strong>描述信息</strong>。每一张维表对应现实世界中的一个对象或者概念。例如：用户、商品、日期、地区等。</p><p><strong>维表的特征：</strong></p><ul><li><p>维表的范围很宽（具有多个属性、列比较多）</p></li><li><p>跟事实表相比，行数相对较小：通常&lt; 10万条</p></li><li><p>内容相对固定：编码表</p></li></ul><p>时间维度表：</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389591658.png" alt="1663389591658"></p><h4 id="2-2-2-事实表"><a href="#2-2-2-事实表" class="headerlink" title="2.2.2 事实表"></a>2.2.2 事实表</h4><p>​事实表中的<strong>每行数据代表一个业务事件（下单、支付、退款、评价等）</strong>。“事实”这个术语表示的是业务事件的<strong>度量值（可统计次数、个数、金额等）</strong>，例如，2021年5月21日，宋宋老师在京东花了250块钱买了一瓶海狗人参丸。维度表：时间、用户、商品、商家。事实表：250块钱、一瓶</p><p>​每一个事实表的行包括：具有可加性的数值型的度量值、与维表相连接的外键，通常具有两个和两个以上的外键。</p><p>​事实表的特征：</p><ul><li><p>非常的大</p></li><li><p>内容相对的窄：列数较少（主要是外键id和度量值）</p></li><li><p>经常发生变化，每天会新增加很多。</p></li></ul><p><strong>事务型事实表</strong></p><p>​以<strong>每个事务或事件为单位</strong>，例如一个销售订单记录，一笔支付记录等，作为事实表里的一行数据。一旦事务被提交，事实表数据被插入，数据就不再进行更改，其更新方式为增量更新。</p><p><strong>周期性快照事实表</strong></p><p>​周期型快照事实表中<strong>不会保留所有数据</strong>，<strong>只保留固定时间间隔的数据</strong>，例如每天或者每月的销售额，或每月的账户余额等。</p><p>​例如购物车，有加减商品，随时都有可能变化，但是我们更关心每天结束时这里面有多少商品，方便我们后期统计分析。</p><p><strong>累积型快照事实表</strong></p><p>​<strong>累计快照事实表用于跟踪业务事实的变化。</strong>例如，数据仓库中可能需要累积或者存储订单从下订单开始，到订单商品被打包、运输、和签收的各个业务阶段的时间点数据来跟踪订单声明周期的进展情况。当这个业务过程进行时，事实表的记录也要不断更新。</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389787499.png" alt="1663389787499"></p><h3 id="2-3-维度模型分类"><a href="#2-3-维度模型分类" class="headerlink" title="2.3 维度模型分类"></a>2.3 维度模型分类</h3><p>​在维度建模的基础上又分为三种模型：星型模型、雪花模型、星座模型。</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389855394.png" alt="1663389855394"></p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663389868957.png" alt="1663389868957"></p><h3 id="2-4-数据仓库建模"><a href="#2-4-数据仓库建模" class="headerlink" title="2.4 数据仓库建模"></a>2.4 数据仓库建模</h3><h4 id="2-4-1-ODS层"><a href="#2-4-1-ODS层" class="headerlink" title="2.4.1 ODS层"></a>2.4.1 ODS层</h4><p>​针对HDFS上的用户行为数据和业务数据，我们如何规划处理？</p><p>（1）保持数据原貌不做任何修改，起到备份数据的作用。</p><p>（2）数据采用压缩，减少磁盘存储空间（例如：原始数据100G，可以压缩到10G左右）</p><p>（3）创建分区表，防止后续的全表扫描</p><h4 id="2-4-2-DIM层和DWD层"><a href="#2-4-2-DIM层和DWD层" class="headerlink" title="2.4.2 DIM层和DWD层"></a>2.4.2 DIM层和DWD层</h4><p>DIM层DWD层需构建维度模型，一般采用星型模型，呈现的状态一般为星座模型。</p><p>维度建模一般按照以下四个步骤：</p><p><strong>选择业务过程→声明粒度→确认维度→确认事实</strong></p><p><strong>（1）选择业务过程</strong></p><p>在业务系统中，挑选我们感兴趣的业务线，比如下单业务，支付业务，退款业务，物流业务，一条业务线对应一张事实表。</p><p><strong>（2）声明粒度</strong></p><p>数据粒度指数据仓库的数据中保存数据的细化程度或综合程度的级别。</p><p>声明粒度意味着精确定义事实表中的一行数据表示什么，应该尽可能选择<strong>最小粒度</strong>，以此来应各种各样的需求。</p><p><strong>典型的粒度声明如下：</strong></p><p>订单事实表中一行数据表示的是一个订单中的一个商品项。</p><p>支付事实表中一行数据表示的是一个支付记录。</p><p><strong>（3）确定维度</strong></p><p>维度的主要作用是描述业务是事实，主要表示的是“谁，何处，何时”等信息。</p><p>确定维度的原则是：后续需求中是否要分析相关维度的指标。例如，需要统计，什么时间下的订单多，哪个地区下的订单多，哪个用户下的订单多。需要确定的维度就包括：时间维度、地区维度、用户维度。</p><p><strong>（4）确定事实</strong></p><p>此处的“事实”一词，指的是业务中的度量值（次数、个数、件数、金额，可以进行累加），例如订单金额、下单次数等。</p><p>在DWD层，以<strong>业务过程</strong>为建模驱动，基于每个具体业务过程的特点，构建<strong>最细粒度</strong>的明细层事实表。事实表可做适当的宽表化处理。</p><p>事实表和维度表的关联比较灵活，但是为了应对更复杂的业务需求，可以将能关联上的表尽量关联上。</p><p><img src="/2022/09/17/%E6%95%B0%E4%BB%93%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1663390431982.png" alt="1663390431982"></p><p>至此，数据仓库的维度建模已经完毕，DWD层是以业务过程为驱动。</p><p>DWS层、DWT层和ADS层都是以需求为驱动，和维度建模已经没有关系了。</p><p>DWS和DWT都是建宽表，按照主题去建表。主题相当于观察问题的角度。对应着维度表。</p><h4 id="2-4-3-DWS层和DWT层"><a href="#2-4-3-DWS层和DWT层" class="headerlink" title="2.4.3 DWS层和DWT层"></a>2.4.3 DWS层和DWT层</h4><p>DWS层和DWT层统称宽表层，这两层的设计思想大致相同，通过以下案例进行阐述。</p><p>1）问题引出：两个需求，统计每个省份订单的个数、统计每个省份订单的总金额</p><p>2）处理办法：都是将省份表和订单表进行join，group by省份，然后计算。同样数据被计算了两次，实际上类似的场景还会更多。</p><p>​       那怎么设计能避免重复计算呢？</p><p>针对上述场景，可以设计一张地区宽表，其主键为地区ID，字段包含为：下单次数、下单金额、支付次数、支付金额等。上述所有指标都统一进行计算，并将结果保存在该宽表中，这样就能有效避免数据的重复计算。</p><p>3）总结：</p><p>（１）需要建哪些宽表：以维度为基准。</p><p>（２）宽表里面的字段：是站在不同维度的角度去看事实表，重点关注事实表聚合后的度量值。</p><p>（３）DWS和DWT层的区别：DWS层存放的所有主题对象当天的汇总行为，例如每个地区当天的下单次数，下单金额等，DWT层存放的是所有主题对象的累积行为，例如每个地区最近７天（１５天、３０天、６０天）的下单次数、下单金额等。</p><h4 id="2-4-4-ADS层"><a href="#2-4-4-ADS层" class="headerlink" title="2.4.4 ADS层"></a>2.4.4 ADS层</h4><p>​对电商系统各大主题指标分别进行分析。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 离线数仓 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 数仓分层 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Kafka集群机器数和分区数的计算</title>
+      <link href="/2022/09/16/Kafka%E4%B8%AD%E5%88%86%E5%8C%BA%E6%95%B0%E5%92%8C%E6%9C%BA%E5%99%A8%E6%95%B0%E7%9A%84%E8%AE%A1%E7%AE%97/"/>
+      <url>/2022/09/16/Kafka%E4%B8%AD%E5%88%86%E5%8C%BA%E6%95%B0%E5%92%8C%E6%9C%BA%E5%99%A8%E6%95%B0%E7%9A%84%E8%AE%A1%E7%AE%97/</url>
+      
+        <content type="html"><![CDATA[<h2 id="1-Kfaka机器数量的计算"><a href="#1-Kfaka机器数量的计算" class="headerlink" title="1.Kfaka机器数量的计算"></a>1.Kfaka机器数量的计算</h2><p>首先我们需要知道这个数据集群中最大生产速度</p><p>然后我们需要确定这个topic需要的副本数量，这样我们就可以确定一个集群中Kafka的数量</p><p>Kafka机器数量（经验公式）&#x3D;2<em>（峰值生产速度</em>副本数&#x2F;100）+1</p><p>比如我们的峰值生产速度是50M&#x2F;s。副本数为2。</p><p>Kafka机器数量&#x3D;2×（50×2&#x2F;100）+ 1&#x3D;3台</p><h2 id="2-Kafka分区数目的计算"><a href="#2-Kafka分区数目的计算" class="headerlink" title="2. Kafka分区数目的计算"></a>2. Kafka分区数目的计算</h2><p>1）创建一个只有1个分区的topic</p><p>2）测试这个topic的producer吞吐量和consumer吞吐量。</p><p>3）假设他们的值分别是Tp和Tc，单位可以是MB&#x2F;s。</p><p>4）然后假设总的目标吞吐量是Tt，那么分区数&#x3D;Tt &#x2F; min（Tp，Tc）</p><p>例如：producer吞吐量&#x3D;20m&#x2F;s；consumer吞吐量&#x3D;50m&#x2F;s，期望吞吐量100m&#x2F;s；</p><p>分区数&#x3D;100 &#x2F; 20 &#x3D;5分区</p><p><a href="https://blog.csdn.net/weixin_42641909/article/details/89294698">https://blog.csdn.net/weixin_42641909/article/details/89294698</a></p><p>分区数一般设置为：3-10个</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 离线数仓 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Kakfa集群数目的计算 </tag>
+            
+            <tag> kakfa机器数目的计算 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>环境变量的设置</title>
+      <link href="/2022/09/15/linux%E4%B8%AD%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E7%9A%84%E9%85%8D%E7%BD%AE/"/>
+      <url>/2022/09/15/linux%E4%B8%AD%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E7%9A%84%E9%85%8D%E7%BD%AE/</url>
+      
+        <content type="html"><![CDATA[<p>​在Linux中环境变量可以在多个文件中去配置，比如&#x2F;etc&#x2F;profile，&#x2F;etc&#x2F;profile.d&#x2F;*.sh，<del>&#x2F;.bashrc ，</del>&#x2F;.bash_profile等，下面说明上述几个文件之间的关系和区别。</p><p>​bash的运行模式可分为login shell和non-login shell。</p><p>​例如，我们通过终端，输入用户名、密码，登录系统之后，得到就是一个login shell，而当我们执行以下命令ssh hadoop103 command，在hadoop103执行command的就是一个non-login shell。</p><p>​这两种shell的主要区别在于，它们启动时会加载不同的配置文件，login shell启动时会加载&#x2F;etc&#x2F;profile，<del>&#x2F;.bash_profile，</del>&#x2F;.bashrc，non-login shell启动时会加载~&#x2F;.bashrc。</p><p>​而在加载<del>&#x2F;.bashrc（实际是</del>&#x2F;.bashrc中加载的&#x2F;etc&#x2F;bashrc）或&#x2F;etc&#x2F;profile时，都会执行如下代码片段，</p><p><img src="/2022/09/15/linux%E4%B8%AD%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E7%9A%84%E9%85%8D%E7%BD%AE/1663256723054.png" alt="1663256723054"></p><p>​因此不管是loginshell还是non-login shell，启动时都会加载&#x2F;etc&#x2F;profile.d&#x2F;*.sh中的环境变量。</p><p>​因此我们可以选择在profile.d文件夹中创建一个sh文件，里面配置环境变量，那么登录的shell 以及非登录shell都可以得到环境变量。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> login shell </tag>
+            
+            <tag> non-login shell </tag>
+            
+            <tag> 环境变量 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>剑指offer03.数组中的重复数字</title>
       <link href="/2022/09/15/%E5%89%91%E6%8C%87offer/%E5%89%91%E6%8C%87offer03-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E6%95%B0%E5%AD%97/"/>
       <url>/2022/09/15/%E5%89%91%E6%8C%87offer/%E5%89%91%E6%8C%87offer03-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E6%95%B0%E5%AD%97/</url>
