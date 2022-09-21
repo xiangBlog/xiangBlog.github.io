@@ -547,6 +547,119 @@
              <!-- 隐藏某个文章 -->
             <div class="article col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
+                    <a href="/2022/09/21/%E5%89%91%E6%8C%87offer14-%E5%89%AA%E7%BB%B3%E5%AD%90/">
+                        <div class="card-image">
+                            
+                            
+                            <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="剑指offer14.剪绳子">
+                            
+                            <span class="card-title">剑指offer14.剪绳子</span>
+                        </div>
+                    </a>
+
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                
+本题目由于n的最大数为58，因此还可以使用O(n^2)的动态规划算法。后面还有个剪绳子2，就不能使用此动态规划算法。
+对于动态规划算法我们需要确定几个条件：
+
+动态规划数组中的第i个值代表什么，我们在此将其第i个值当作长度为i的绳子最长的
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-09-21
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/leetcode/" class="post-category">
+                                    leetcode
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/DP/">
+                            <span class="chip bg-color">DP</span>
+                        </a>
+                        
+                        <a href="/tags/%E6%95%B0%E5%AD%A6%E8%BF%90%E7%AE%97/">
+                            <span class="chip bg-color">数学运算</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+              <!-- 隐藏某个文章 -->
+            
+             <!-- 隐藏某个文章 -->
+            <div class="article col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2022/09/21/%E5%89%91%E6%8C%87offer12-%E7%9F%A9%E9%98%B5%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/">
+                        <div class="card-image">
+                            
+                            
+                            <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="剑指offer12.矩阵中的路径">
+                            
+                            <span class="card-title">剑指offer12.矩阵中的路径</span>
+                        </div>
+                    </a>
+
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                题目描述
+
+思路目前整体思路：
+首先在整个矩阵中寻找string第一个字符的所有位置，然后对于每一个位置从头开始遍历，使用一个N*M的矩阵用来代表某一个位置是否被遍历过，本来想着使用迭代的思路去求解，但是迭代的方式回溯很难实现，因此可以使用
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-09-21
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/leetcode/" class="post-category">
+                                    leetcode
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/%E5%9B%9E%E6%BA%AF/">
+                            <span class="chip bg-color">回溯</span>
+                        </a>
+                        
+                        <a href="/tags/DFS/">
+                            <span class="chip bg-color">DFS</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+              <!-- 隐藏某个文章 -->
+            
+             <!-- 隐藏某个文章 -->
+            <div class="article col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
                     <a href="/2022/09/19/DWD%E5%B1%82%E7%9A%84%E6%9E%84%E5%BB%BA/">
                         <div class="card-image">
                             
@@ -1073,133 +1186,34 @@ Kafka机器数量（经验公式）&#x3D;2（峰值生产速度副本数&#x2F;
             </div>
               <!-- 隐藏某个文章 -->
             
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2022/09/15/%E5%89%91%E6%8C%87offer/%E5%89%91%E6%8C%87offer03-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E6%95%B0%E5%AD%97/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/medias/featureimages/27.jpg" class="responsive-img" alt="剑指offer03.数组中的重复数字">
-                            
-                            <span class="card-title">剑指offer03.数组中的重复数字</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                
-本题目一共有两种解决思路
-第一种思路很简单，就是使用空间换时间的思路，用一个set存储数字，出现过就直接返回，这种思路比较容易想到。
-代码如下：
-class Solution {
-    public int findRepeatNumb
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-09-15
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E5%89%91%E6%8C%87offer/" class="post-category">
-                                    剑指offer
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/set/">
-                            <span class="chip bg-color">set</span>
-                        </a>
-                        
-                        <a href="/tags/%E6%95%B0%E7%BB%84/">
-                            <span class="chip bg-color">数组</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2020/02/18/java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/medias/featureimages/30.jpg" class="responsive-img" alt="Java多线程">
-                            
-                            <span class="card-title">Java多线程</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                介绍了Java中的多线程
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-02-18
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/java/" class="post-category">
-                                    java
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">
-                            <span class="chip bg-color">多线程</span>
-                        </a>
-                        
-                        <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
-                            <span class="chip bg-color">单例模式</span>
-                        </a>
-                        
-                        <a href="/tags/sleep/">
-                            <span class="chip bg-color">sleep</span>
-                        </a>
-                        
-                        <a href="/tags/wait/">
-                            <span class="chip bg-color">wait</span>
-                        </a>
-                        
-                        <a href="/tags/thread/">
-                            <span class="chip bg-color">thread</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
         </div>
     </article>
 
 </main>
+
+
+<div class="container paging">
+    <div class="row">
+        <div class="col s6 m4 l4">
+            
+            <a class="left btn-floating btn-large disabled">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            
+        </div>
+        <div class="page-info col m4 l4 hide-on-small-only">
+            <div class="center-align b-text-gray">1 / 2</div>
+        </div>
+        <div class="col s6 m4 l4">
+            
+            <a href="/page/2/"
+               class="right btn-floating btn-large waves-effect waves-light bg-color">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            
+        </div>
+    </div>
+</div>
 
 
 
@@ -1220,7 +1234,7 @@ class Solution {
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">28.4k</span>
+                        class="white-color">29.4k</span>
             
             
             
