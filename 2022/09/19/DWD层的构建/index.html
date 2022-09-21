@@ -375,7 +375,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-19
+                    2022-09-21
                 </div>
                 
 
@@ -1601,635 +1601,738 @@ APP<span class="token operator">=</span>gmall
    <span class="token keyword">exit</span>
 fi 
 
-dim_user_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_user_info partition(dt='9999-99-99')
+dwd_order_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_info partition(dt)
 select
-    id,
-    login_name,
-    nick_name,
-    md5(name),
-    md5(phone_num),
-    md5(email),
-    user_level,
-    birthday,
-    gender,
-    create_time,
-    operate_time,
-    '$do_date',
-    '9999-99-99'
-from ${APP}.ods_user_info
-where dt='$do_date';
-"</span>
-
-dim_sku_info<span class="token operator">=</span><span class="token string">"
-with
-sku as
-(
-    select
-        id,
-        price,
-        sku_name,
-        sku_desc,
-        weight,
-        is_sale,
-        spu_id,
-        category3_id,
-        tm_id,
-        create_time
-    from ${APP}.ods_sku_info
-    where dt='$do_date'
-),
-spu as
-(
-    select
-        id,
-        spu_name
-    from ${APP}.ods_spu_info
-    where dt='$do_date'
-),
-c3 as
-(
-    select
-        id,
-        name,
-        category2_id
-    from ${APP}.ods_base_category3
-    where dt='$do_date'
-),
-c2 as
-(
-    select
-        id,
-        name,
-        category1_id
-    from ${APP}.ods_base_category2
-    where dt='$do_date'
-),
-c1 as
-(
-    select
-        id,
-        name
-    from ${APP}.ods_base_category1
-    where dt='$do_date'
-),
-tm as
-(
-    select
-        id,
-        tm_name
-    from ${APP}.ods_base_trademark
-    where dt='$do_date'
-),
-attr as
-(
-    select
-        sku_id,
-        collect_set(named_struct('attr_id',attr_id,'value_id',value_id,'attr_name',attr_name,'value_name',value_name)) attrs
-    from ${APP}.ods_sku_attr_value
-    where dt='$do_date'
-    group by sku_id
-),
-sale_attr as
-(
-    select
-        sku_id,
-        collect_set(named_struct('sale_attr_id',sale_attr_id,'sale_attr_value_id',sale_attr_value_id,'sale_attr_name',sale_attr_name,'sale_attr_value_name',sale_attr_value_name)) sale_attrs
-    from ${APP}.ods_sku_sale_attr_value
-    where dt='$do_date'
-    group by sku_id
-)
-
-insert overwrite table ${APP}.dim_sku_info partition(dt='$do_date')
-select
-    sku.id,
-    sku.price,
-    sku.sku_name,
-    sku.sku_desc,
-    sku.weight,
-    sku.is_sale,
-    sku.spu_id,
-    spu.spu_name,
-    sku.category3_id,
-    c3.name,
-    c3.category2_id,
-    c2.name,
-    c2.category1_id,
-    c1.name,
-    sku.tm_id,
-    tm.tm_name,
-    attr.attrs,
-    sale_attr.sale_attrs,
-    sku.create_time
-from sku
-left join spu on sku.spu_id=spu.id
-left join c3 on sku.category3_id=c3.id
-left join c2 on c3.category2_id=c2.id
-left join c1 on c2.category1_id=c1.id
-left join tm on sku.tm_id=tm.id
-left join attr on sku.id=attr.sku_id
-left join sale_attr on sku.id=sale_attr.sku_id;
-"</span>
-
-dim_base_province<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_base_province
-select
-    bp.id,
-    bp.name,
-    bp.area_code,
-    bp.iso_code,
-    bp.iso_3166_2,
-    bp.region_id,
-    br.region_name
-from ${APP}.ods_base_province bp
-join ${APP}.ods_base_region br on bp.region_id = br.id;
-"</span>
-
-dim_coupon_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_coupon_info partition(dt='$do_date')
-select
-    id,
-    coupon_name,
-    coupon_type,
-    condition_amount,
-    condition_num,
-    activity_id,
-    benefit_amount,
-    benefit_discount,
-    create_time,
-    range_type,
-    limit_num,
-    taken_count,
-    start_time,
-    end_time,
-    operate_time,
-    expire_time
-from ${APP}.ods_coupon_info
-where dt='$do_date';
-"</span>
-
-dim_activity_rule_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_activity_rule_info partition(dt='$do_date')
-select
-    ar.id,
-    ar.activity_id,
-    ai.activity_name,
-    ar.activity_type,
-    ai.start_time,
-    ai.end_time,
-    ai.create_time,
-    ar.condition_amount,
-    ar.condition_num,
-    ar.benefit_amount,
-    ar.benefit_discount,
-    ar.benefit_level
+    oi.id,
+    oi.order_status,
+    oi.user_id,
+    oi.province_id,
+    oi.payment_way,
+    oi.delivery_address,
+    oi.out_trade_no,
+    oi.tracking_no,
+    oi.create_time,
+    times.ts['1002'] payment_time,
+    times.ts['1003'] cancel_time,
+    times.ts['1004'] finish_time,
+    times.ts['1005'] refund_time,
+    times.ts['1006'] refund_finish_time,
+    oi.expire_time,
+    feight_fee,
+    feight_fee_reduce,
+    activity_reduce_amount,
+    coupon_reduce_amount,
+    original_amount,
+    final_amount,
+    coalesce(date_format(times.ts['1003'],'yyyy-MM-dd'),date_format(times.ts['1004'],'yyyy-MM-dd'),date_format(times.ts['1006'],'yyyy-MM-dd'),date_format(oi.expire_time,'yyyy-MM-dd'),'9999-99-99')
 from
 (
     select
-        id,
-        activity_id,
-        activity_type,
-        condition_amount,
-        condition_num,
-        benefit_amount,
-        benefit_discount,
-        benefit_level
-    from ${APP}.ods_activity_rule
+        *
+    from ${APP}.ods_order_info
     where dt='$do_date'
-)ar
+)oi
+left join
+(
+    select
+        order_id,
+        str_to_map(concat_ws(',',collect_set(concat(order_status,'=',operate_time))),',','=') ts
+    from ${APP}.ods_order_status_log
+    where dt='$do_date'
+    group by order_id
+)times
+on oi.id=times.order_id;"</span>
+
+dwd_order_detail<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_detail partition(dt)
+select
+    od.id,
+    od.order_id,
+    oi.user_id,
+    od.sku_id,
+    oi.province_id,
+    oda.activity_id,
+    oda.activity_rule_id,
+    odc.coupon_id,
+    od.create_time,
+    od.source_type,
+    od.source_id,
+    od.sku_num,
+    od.order_price*od.sku_num,
+    od.split_activity_amount,
+    od.split_coupon_amount,
+    od.split_final_amount,
+    date_format(create_time,'yyyy-MM-dd')
+from
+(
+    select
+        *
+    from ${APP}.ods_order_detail
+    where dt='$do_date'
+)od
 left join
 (
     select
         id,
-        activity_name,
-        start_time,
-        end_time,
-        create_time
-    from ${APP}.ods_activity_info
+        user_id,
+        province_id
+    from ${APP}.ods_order_info
     where dt='$do_date'
-)ai
-on ar.activity_id=ai.id;
+)oi
+on od.order_id=oi.id
+left join
+(
+    select
+        order_detail_id,
+        activity_id,
+        activity_rule_id
+    from ${APP}.ods_order_detail_activity
+    where dt='$do_date'
+)oda
+on od.id=oda.order_detail_id
+left join
+(
+    select
+        order_detail_id,
+        coupon_id
+    from ${APP}.ods_order_detail_coupon
+    where dt='$do_date'
+)odc
+on od.id=odc.order_detail_id;"</span>
+
+dwd_payment_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_payment_info partition(dt)
+select
+    pi.id,
+    pi.order_id,
+    pi.user_id,
+    oi.province_id,
+    pi.trade_no,
+    pi.out_trade_no,
+    pi.payment_type,
+    pi.payment_amount,
+    pi.payment_status,
+    pi.create_time,
+    pi.callback_time,
+    nvl(date_format(pi.callback_time,'yyyy-MM-dd'),'9999-99-99')
+from
+(
+    select * from ${APP}.ods_payment_info where dt='$do_date'
+)pi
+left join
+(
+    select id,province_id from ${APP}.ods_order_info where dt='$do_date'
+)oi
+on pi.order_id=oi.id;"</span>
+
+dwd_cart_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_cart_info partition(dt='$do_date')
+select
+    id,
+    user_id,
+    sku_id,
+    source_type,
+    source_id,
+    cart_price,
+    is_ordered,
+    create_time,
+    operate_time,
+    order_time,
+    sku_num
+from ${APP}.ods_cart_info
+where dt='$do_date';"</span>
+
+dwd_comment_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_comment_info partition (dt)
+select
+    id,
+    user_id,
+    sku_id,
+    spu_id,
+    order_id,
+    appraise,
+    create_time,
+    date_format(create_time,'yyyy-MM-dd')
+from ${APP}.ods_comment_info
+where dt='$do_date';
 "</span>
 
+dwd_favor_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_favor_info partition(dt='$do_date')
+select
+    id,
+    user_id,
+    sku_id,
+    spu_id,
+    is_cancel,
+    create_time,
+    cancel_time
+from ${APP}.ods_favor_info
+where dt='$do_date';"</span>
+
+dwd_coupon_use<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_coupon_use partition(dt)
+select
+    id,
+    coupon_id,
+    user_id,
+    order_id,
+    coupon_status,
+    get_time,
+    using_time,
+    used_time,
+    expire_time,
+    coalesce(date_format(used_time,'yyyy-MM-dd'),date_format(expire_time,'yyyy-MM-dd'),'9999-99-99')
+from ${APP}.ods_coupon_use
+where dt='$do_date';"</span>
+
+dwd_order_refund_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_refund_info partition(dt)
+select
+    ri.id,
+    ri.user_id,
+    ri.order_id,
+    ri.sku_id,
+    oi.province_id,
+    ri.refund_type,
+    ri.refund_num,
+    ri.refund_amount,
+    ri.refund_reason_type,
+    ri.create_time,
+    date_format(ri.create_time,'yyyy-MM-dd')
+from
+(
+    select * from ${APP}.ods_order_refund_info where dt='$do_date'
+)ri
+left join
+(
+    select id,province_id from ${APP}.ods_order_info where dt='$do_date'
+)oi
+on ri.order_id=oi.id;"</span>
+
+dwd_refund_payment<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_refund_payment partition(dt)
+select
+    rp.id,
+    user_id,
+    order_id,
+    sku_id,
+    province_id,
+    trade_no,
+    out_trade_no,
+    payment_type,
+    refund_amount,
+    refund_status,
+    create_time,
+    callback_time,
+    nvl(date_format(callback_time,'yyyy-MM-dd'),'9999-99-99')
+from
+(
+    select
+        id,
+        out_trade_no,
+        order_id,
+        sku_id,
+        payment_type,
+        trade_no,
+        refund_amount,
+        refund_status,
+        create_time,
+        callback_time
+    from ${APP}.ods_refund_payment
+    where dt='$do_date'
+)rp
+left join
+(
+    select
+        id,
+        user_id,
+        province_id
+    from ${APP}.ods_order_info
+    where dt='$do_date'
+)oi
+on rp.order_id=oi.id;"</span>
+
 <span class="token keyword">case</span> $<span class="token number">1</span> <span class="token operator">in</span>
-<span class="token string">"dim_user_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_user_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_sku_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_sku_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_base_province"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_base_province"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_coupon_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_coupon_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_activity_rule_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_activity_rule_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"all"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_user_info$dim_sku_info$dim_coupon_info$dim_activity_rule_info$dim_base_province"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_detail <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_detail"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_payment_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_payment_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_cart_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_cart_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_comment_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_comment_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_favor_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_favor_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_coupon_use <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_coupon_use"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_refund_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_refund_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_refund_payment <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_refund_payment"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token keyword">all</span> <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_info$dwd_order_detail$dwd_payment_info$dwd_cart_info$dwd_comment_info$dwd_favor_info$dwd_coupon_use$dwd_order_refund_info$dwd_refund_payment"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
 esac
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h3 id="2-11-业务数据每日导入"><a href="#2-11-业务数据每日导入" class="headerlink" title="2.11 业务数据每日导入"></a>2.11 业务数据每日导入</h3><pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">#!/bin/bash</span>
 
 APP<span class="token operator">=</span>gmall
-
 <span class="token comment" spellcheck="true"># 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天</span>
 <span class="token keyword">if</span> <span class="token punctuation">[</span> <span class="token operator">-</span>n <span class="token string">"$2"</span> <span class="token punctuation">]</span> <span class="token punctuation">;</span><span class="token keyword">then</span>
-do_date<span class="token operator">=</span>$<span class="token number">2</span>
-seconds<span class="token operator">=</span><span class="token punctuation">`</span><span class="token keyword">date</span> <span class="token operator">-</span><span class="token number">d</span> $<span class="token number">2</span> <span class="token operator">+</span><span class="token operator">%</span>s<span class="token punctuation">`</span>
-seconds_yesterday<span class="token operator">=</span>$<span class="token punctuation">(</span><span class="token punctuation">(</span>seconds <span class="token operator">-</span> <span class="token number">86400</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-day_before<span class="token operator">=</span><span class="token punctuation">`</span><span class="token keyword">date</span> <span class="token operator">-</span><span class="token number">d</span> <span class="token variable">@$seconds_yesterday</span> <span class="token operator">+</span><span class="token operator">%</span>F<span class="token punctuation">`</span>
+    do_date<span class="token operator">=</span>$<span class="token number">2</span>
 <span class="token keyword">else</span>
     <span class="token keyword">exit</span> 
     do_date<span class="token operator">=</span><span class="token punctuation">`</span><span class="token keyword">date</span> <span class="token operator">-</span><span class="token number">d</span> <span class="token string">"-1 day"</span> <span class="token operator">+</span><span class="token operator">%</span>F<span class="token punctuation">`</span>
 fi
-dim_user_info<span class="token operator">=</span><span class="token string">"
-with
-    tmp as
-        (
-            select
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.id,null) old_id,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.login_name,null) old_login_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.nick_name,null) old_nick_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.name,null) old_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.phone_num,null) old_phone_num,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.email,null) old_email,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.user_level,null) old_user_level,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.birthday,null) old_birthday,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.gender,null) old_gender,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.create_time,null) old_create_time,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.operate_time,null) old_operate_time,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.start_date,null) old_start_date,
-                if(ods_ui.id is not null and dim_ui.id is not null,date_add('$do_date',-1),null) old_end_date,
-                nvl(ods_ui.id,dim_ui.id) new_id,
-                nvl(ods_ui.login_name,dim_ui.login_name) new_login_name,
-                nvl(ods_ui.nick_name,dim_ui.nick_name) new_nick_name,
-                nvl(ods_ui.name,dim_ui.name) new_name,
-                nvl(ods_ui.phone_num,dim_ui.phone_num) new_phone_num,
-                nvl(ods_ui.email,dim_ui.email) new_email,
-                nvl(ods_ui.user_level,dim_ui.user_level) new_user_level,
-                nvl(ods_ui.birthday,dim_ui.birthday) new_birthday,
-                nvl(ods_ui.gender,dim_ui.gender) new_gender,
-                nvl(ods_ui.create_time,dim_ui.create_time) new_create_time,
-                nvl(ods_ui.operate_time,dim_ui.operate_time) new_operate_time,
-                if(ods_ui.id is not null,'$do_date',dim_ui.start_date) new_start_date,
-                '9999-99-99' new_end_date
-            from
-                (
-                    select
-                        id,
-                        login_name,
-                        nick_name,
-                        name,
-                        phone_num,
-                        email,
-                        user_level,
-                        birthday,
-                        gender,
-                        create_time,
-                        operate_time,
-                        start_date,
-                        end_date
-                    from gmall.dim_user_info where dt='9999-99-99'
-                )dim_ui
-                    full outer join
-                (
-                    select
-                        id,
-                        login_name,
-                        nick_name,
-                        md5(name) name,
-                        md5(phone_num) phone_num,
-                        md5(email) email,
-                        user_level,
-                        birthday,
-                        gender,
-                        create_time,
-                        operate_time
-                    from gmall.ods_user_info where dt='$do_date'
-                )ods_ui
-                on dim_ui.id=ods_ui.id
-        )
-insert overwrite table gmall.dim_user_info partition(dt='$day_before')
+
+dwd_order_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_info partition(dt)
 select
-    old_id,
-    old_login_name,
-    old_nick_name,
-    old_name,
-    old_phone_num,
-    old_email,
-    old_user_level,
-    old_birthday,
-    old_gender,
-    old_create_time,
-    old_operate_time,
-    old_start_date,
-    old_end_date
-from tmp
-where old_id is not null;
-
-
-with
-    tmp as
-        (
-            select
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.id,null) old_id,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.login_name,null) old_login_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.nick_name,null) old_nick_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.name,null) old_name,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.phone_num,null) old_phone_num,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.email,null) old_email,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.user_level,null) old_user_level,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.birthday,null) old_birthday,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.gender,null) old_gender,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.create_time,null) old_create_time,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.operate_time,null) old_operate_time,
-                if(ods_ui.id is not null and dim_ui.id is not null,dim_ui.start_date,null) old_start_date,
-                if(ods_ui.id is not null and dim_ui.id is not null,date_add('$do_date',-1),null) old_end_date,
-                nvl(ods_ui.id,dim_ui.id) new_id,
-                nvl(ods_ui.login_name,dim_ui.login_name) new_login_name,
-                nvl(ods_ui.nick_name,dim_ui.nick_name) new_nick_name,
-                nvl(ods_ui.name,dim_ui.name) new_name,
-                nvl(ods_ui.phone_num,dim_ui.phone_num) new_phone_num,
-                nvl(ods_ui.email,dim_ui.email) new_email,
-                nvl(ods_ui.user_level,dim_ui.user_level) new_user_level,
-                nvl(ods_ui.birthday,dim_ui.birthday) new_birthday,
-                nvl(ods_ui.gender,dim_ui.gender) new_gender,
-                nvl(ods_ui.create_time,dim_ui.create_time) new_create_time,
-                nvl(ods_ui.operate_time,dim_ui.operate_time) new_operate_time,
-                if(ods_ui.id is not null,'$do_date',dim_ui.start_date) new_start_date,
-                '9999-99-99' new_end_date
-            from
-                (
-                    select
-                        id,
-                        login_name,
-                        nick_name,
-                        name,
-                        phone_num,
-                        email,
-                        user_level,
-                        birthday,
-                        gender,
-                        create_time,
-                        operate_time,
-                        start_date,
-                        end_date
-                    from gmall.dim_user_info where dt='9999-99-99'
-                )dim_ui
-                    full outer join
-                (
-                    select
-                        id,
-                        login_name,
-                        nick_name,
-                        md5(name) name,
-                        md5(phone_num) phone_num,
-                        md5(email) email,
-                        user_level,
-                        birthday,
-                        gender,
-                        create_time,
-                        operate_time
-                    from gmall.ods_user_info where dt='$do_date'
-                )ods_ui
-                on dim_ui.id=ods_ui.id
-        )
-insert overwrite table gmall.dim_user_info partition(dt='9999-99-99')
-select
-    new_id,
-    new_login_name,
-    new_nick_name,
-    new_name,
-    new_phone_num,
-    new_email,
-    new_user_level,
-    new_birthday,
-    new_gender,
-    new_create_time,
-    new_operate_time,
-    new_start_date,
-    new_end_date
-from tmp;
-"</span>
-
-dim_sku_info<span class="token operator">=</span><span class="token string">"
-with
-sku as
-(
-    select
-        id,
-        price,
-        sku_name,
-        sku_desc,
-        weight,
-        is_sale,
-        spu_id,
-        category3_id,
-        tm_id,
-        create_time
-    from ${APP}.ods_sku_info
-    where dt='$do_date'
-),
-spu as
-(
-    select
-        id,
-        spu_name
-    from ${APP}.ods_spu_info
-    where dt='$do_date'
-),
-c3 as
-(
-    select
-        id,
-        name,
-        category2_id
-    from ${APP}.ods_base_category3
-    where dt='$do_date'
-),
-c2 as
-(
-    select
-        id,
-        name,
-        category1_id
-    from ${APP}.ods_base_category2
-    where dt='$do_date'
-),
-c1 as
-(
-    select
-        id,
-        name
-    from ${APP}.ods_base_category1
-    where dt='$do_date'
-),
-tm as
-(
-    select
-        id,
-        tm_name
-    from ${APP}.ods_base_trademark
-    where dt='$do_date'
-),
-attr as
-(
-    select
-        sku_id,
-        collect_set(named_struct('attr_id',attr_id,'value_id',value_id,'attr_name',attr_name,'value_name',value_name)) attrs
-    from ${APP}.ods_sku_attr_value
-    where dt='$do_date'
-    group by sku_id
-),
-sale_attr as
-(
-    select
-        sku_id,
-        collect_set(named_struct('sale_attr_id',sale_attr_id,'sale_attr_value_id',sale_attr_value_id,'sale_attr_name',sale_attr_name,'sale_attr_value_name',sale_attr_value_name)) sale_attrs
-    from ${APP}.ods_sku_sale_attr_value
-    where dt='$do_date'
-    group by sku_id
-)
-
-insert overwrite table ${APP}.dim_sku_info partition(dt='$do_date')
-select
-    sku.id,
-    sku.price,
-    sku.sku_name,
-    sku.sku_desc,
-    sku.weight,
-    sku.is_sale,
-    sku.spu_id,
-    spu.spu_name,
-    sku.category3_id,
-    c3.name,
-    c3.category2_id,
-    c2.name,
-    c2.category1_id,
-    c1.name,
-    sku.tm_id,
-    tm.tm_name,
-    attr.attrs,
-    sale_attr.sale_attrs,
-    sku.create_time
-from sku
-left join spu on sku.spu_id=spu.id
-left join c3 on sku.category3_id=c3.id
-left join c2 on c3.category2_id=c2.id
-left join c1 on c2.category1_id=c1.id
-left join tm on sku.tm_id=tm.id
-left join attr on sku.id=attr.sku_id
-left join sale_attr on sku.id=sale_attr.sku_id;
-"</span>
-
-dim_base_province<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_base_province
-select
-    bp.id,
-    bp.name,
-    bp.area_code,
-    bp.iso_code,
-    bp.iso_3166_2,
-    bp.region_id,
-    bp.name
-from ${APP}.ods_base_province bp
-join ${APP}.ods_base_region br on bp.region_id = br.id;
-"</span>
-
-dim_coupon_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_coupon_info partition(dt='$do_date')
-select
-    id,
-    coupon_name,
-    coupon_type,
-    condition_amount,
-    condition_num,
-    activity_id,
-    benefit_amount,
-    benefit_discount,
-    create_time,
-    range_type,
-    limit_num,
-    taken_count,
-    start_time,
-    end_time,
-    operate_time,
-    expire_time
-from ${APP}.ods_coupon_info
-where dt='$do_date';
-"</span>
-
-dim_activity_rule_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dim_activity_rule_info partition(dt='$do_date')
-select
-    ar.id,
-    ar.activity_id,
-    ai.activity_name,
-    ar.activity_type,
-    ai.start_time,
-    ai.end_time,
-    ai.create_time,
-    ar.condition_amount,
-    ar.condition_num,
-    ar.benefit_amount,
-    ar.benefit_discount,
-    ar.benefit_level
+    nvl(new.id,old.id),
+    nvl(new.order_status,old.order_status),
+    nvl(new.user_id,old.user_id),
+    nvl(new.province_id,old.province_id),
+    nvl(new.payment_way,old.payment_way),
+    nvl(new.delivery_address,old.delivery_address),
+    nvl(new.out_trade_no,old.out_trade_no),
+    nvl(new.tracking_no,old.tracking_no),
+    nvl(new.create_time,old.create_time),
+    nvl(new.payment_time,old.payment_time),
+    nvl(new.cancel_time,old.cancel_time),
+    nvl(new.finish_time,old.finish_time),
+    nvl(new.refund_time,old.refund_time),
+    nvl(new.refund_finish_time,old.refund_finish_time),
+    nvl(new.expire_time,old.expire_time),
+    nvl(new.feight_fee,old.feight_fee),
+    nvl(new.feight_fee_reduce,old.feight_fee_reduce),
+    nvl(new.activity_reduce_amount,old.activity_reduce_amount),
+    nvl(new.coupon_reduce_amount,old.coupon_reduce_amount),
+    nvl(new.original_amount,old.original_amount),
+    nvl(new.final_amount,old.final_amount),
+    coalesce(date_format(nvl(new.cancel_time,old.cancel_time),'yyyy-MM-dd'),date_format(nvl(new.finish_time,old.finish_time),'yyyy-MM-dd'),date_format(nvl(new.refund_finish_time,old.refund_finish_time),'yyyy-MM-dd'),date_format(nvl(new.expire_time,old.expire_time),'yyyy-MM-dd'),'9999-99-99')
 from
 (
     select
         id,
-        activity_id,
-        activity_type,
-        condition_amount,
-        condition_num,
-        benefit_amount,
-        benefit_discount,
-        benefit_level
-    from ${APP}.ods_activity_rule
+        order_status,
+        user_id,
+        province_id,
+        payment_way,
+        delivery_address,
+        out_trade_no,
+        tracking_no,
+        create_time,
+        payment_time,
+        cancel_time,
+        finish_time,
+        refund_time,
+        refund_finish_time,
+        expire_time,
+        feight_fee,
+        feight_fee_reduce,
+        activity_reduce_amount,
+        coupon_reduce_amount,
+        original_amount,
+        final_amount
+    from ${APP}.dwd_order_info
+    where dt='9999-99-99'
+)old
+full outer join
+(
+    select
+        oi.id,
+        oi.order_status,
+        oi.user_id,
+        oi.province_id,
+        oi.payment_way,
+        oi.delivery_address,
+        oi.out_trade_no,
+        oi.tracking_no,
+        oi.create_time,
+        times.ts['1002'] payment_time,
+        times.ts['1003'] cancel_time,
+        times.ts['1004'] finish_time,
+        times.ts['1005'] refund_time,
+        times.ts['1006'] refund_finish_time,
+        oi.expire_time,
+        feight_fee,
+        feight_fee_reduce,
+        activity_reduce_amount,
+        coupon_reduce_amount,
+        original_amount,
+        final_amount
+    from
+    (
+        select
+            *
+        from ${APP}.ods_order_info
+        where dt='$do_date'
+    )oi
+    left join
+    (
+        select
+            order_id,
+            str_to_map(concat_ws(',',collect_set(concat(order_status,'=',operate_time))),',','=') ts
+        from ${APP}.ods_order_status_log
+        where dt='$do_date'
+        group by order_id
+    )times
+    on oi.id=times.order_id
+)new
+on old.id=new.id;"</span>
+
+dwd_order_detail<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_detail partition(dt='$do_date')
+select
+    od.id,
+    od.order_id,
+    oi.user_id,
+    od.sku_id,
+    oi.province_id,
+    oda.activity_id,
+    oda.activity_rule_id,
+    odc.coupon_id,
+    od.create_time,
+    od.source_type,
+    od.source_id,
+    od.sku_num,
+    od.order_price*od.sku_num,
+    od.split_activity_amount,
+    od.split_coupon_amount,
+    od.split_final_amount
+from
+(
+    select
+        *
+    from ${APP}.ods_order_detail
     where dt='$do_date'
-)ar
+)od
 left join
 (
     select
         id,
-        activity_name,
-        start_time,
-        end_time,
-        create_time
-    from ${APP}.ods_activity_info
+        user_id,
+        province_id
+    from ${APP}.ods_order_info
     where dt='$do_date'
-)ai
-on ar.activity_id=ai.id;
-"</span>
+)oi
+on od.order_id=oi.id
+left join
+(
+    select
+        order_detail_id,
+        activity_id,
+        activity_rule_id
+    from ${APP}.ods_order_detail_activity
+    where dt='$do_date'
+)oda
+on od.id=oda.order_detail_id
+left join
+(
+    select
+        order_detail_id,
+        coupon_id
+    from ${APP}.ods_order_detail_coupon
+    where dt='$do_date'
+)odc
+on od.id=odc.order_detail_id;"</span>
 
+
+dwd_payment_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_payment_info partition(dt)
+select
+    nvl(new.id,old.id),
+    nvl(new.order_id,old.order_id),
+    nvl(new.user_id,old.user_id),
+    nvl(new.province_id,old.province_id),
+    nvl(new.trade_no,old.trade_no),
+    nvl(new.out_trade_no,old.out_trade_no),
+    nvl(new.payment_type,old.payment_type),
+    nvl(new.payment_amount,old.payment_amount),
+    nvl(new.payment_status,old.payment_status),
+    nvl(new.create_time,old.create_time),
+    nvl(new.callback_time,old.callback_time),
+    nvl(date_format(nvl(new.callback_time,old.callback_time),'yyyy-MM-dd'),'9999-99-99')
+from
+(
+    select id,
+       order_id,
+       user_id,
+       province_id,
+       trade_no,
+       out_trade_no,
+       payment_type,
+       payment_amount,
+       payment_status,
+       create_time,
+       callback_time
+    from ${APP}.dwd_payment_info
+    where dt = '9999-99-99'
+)old
+full outer join
+(
+    select
+        pi.id,
+        pi.out_trade_no,
+        pi.order_id,
+        pi.user_id,
+        oi.province_id,
+        pi.payment_type,
+        pi.trade_no,
+        pi.payment_amount,
+        pi.payment_status,
+        pi.create_time,
+        pi.callback_time
+    from
+    (
+        select * from ${APP}.ods_payment_info where dt='$do_date'
+    )pi
+    left join
+    (
+        select id,province_id from ${APP}.ods_order_info where dt='$do_date'
+    )oi
+    on pi.order_id=oi.id
+)new
+on old.id=new.id;"</span>
+
+dwd_cart_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_cart_info partition(dt='$do_date')
+select
+    id,
+    user_id,
+    sku_id,
+    source_type,
+    source_id,
+    cart_price,
+    is_ordered,
+    create_time,
+    operate_time,
+    order_time,
+    sku_num
+from ${APP}.ods_cart_info
+where dt='$do_date';"</span>
+
+
+dwd_comment_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_comment_info partition(dt='$do_date')
+select
+    id,
+    user_id,
+    sku_id,
+    spu_id,
+    order_id,
+    appraise,
+    create_time
+from ${APP}.ods_comment_info where dt='$do_date';"</span>
+
+
+dwd_favor_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_favor_info partition(dt='$do_date')
+select
+    id,
+    user_id,
+    sku_id,
+    spu_id,
+    is_cancel,
+    create_time,
+    cancel_time
+from ${APP}.ods_favor_info
+where dt='$do_date';"</span>
+
+
+dwd_coupon_use<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_coupon_use partition(dt)
+select
+    nvl(new.id,old.id),
+    nvl(new.coupon_id,old.coupon_id),
+    nvl(new.user_id,old.user_id),
+    nvl(new.order_id,old.order_id),
+    nvl(new.coupon_status,old.coupon_status),
+    nvl(new.get_time,old.get_time),
+    nvl(new.using_time,old.using_time),
+    nvl(new.used_time,old.used_time),
+    nvl(new.expire_time,old.expire_time),
+    coalesce(date_format(nvl(new.used_time,old.used_time),'yyyy-MM-dd'),date_format(nvl(new.expire_time,old.expire_time),'yyyy-MM-dd'),'9999-99-99')
+from
+(
+    select
+        id,
+        coupon_id,
+        user_id,
+        order_id,
+        coupon_status,
+        get_time,
+        using_time,
+        used_time,
+        expire_time
+    from ${APP}.dwd_coupon_use
+    where dt='9999-99-99'
+)old
+full outer join
+(
+    select
+        id,
+        coupon_id,
+        user_id,
+        order_id,
+        coupon_status,
+        get_time,
+        using_time,
+        used_time,
+        expire_time
+    from ${APP}.ods_coupon_use
+    where dt='$do_date'
+)new
+on old.id=new.id;"</span>
+
+dwd_order_refund_info<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_order_refund_info partition(dt='$do_date')
+select
+    ri.id,
+    ri.user_id,
+    ri.order_id,
+    ri.sku_id,
+    oi.province_id,
+    ri.refund_type,
+    ri.refund_num,
+    ri.refund_amount,
+    ri.refund_reason_type,
+    ri.create_time
+from
+(
+    select * from ${APP}.ods_order_refund_info where dt='$do_date'
+)ri
+left join
+(
+    select id,province_id from ${APP}.ods_order_info where dt='$do_date'
+)oi
+on ri.order_id=oi.id;"</span>
+
+
+dwd_refund_payment<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.dwd_refund_payment partition(dt)
+select
+    nvl(new.id,old.id),
+    nvl(new.user_id,old.user_id),
+    nvl(new.order_id,old.order_id),
+    nvl(new.sku_id,old.sku_id),
+    nvl(new.province_id,old.province_id),
+    nvl(new.trade_no,old.trade_no),
+    nvl(new.out_trade_no,old.out_trade_no),
+    nvl(new.payment_type,old.payment_type),
+    nvl(new.refund_amount,old.refund_amount),
+    nvl(new.refund_status,old.refund_status),
+    nvl(new.create_time,old.create_time),
+    nvl(new.callback_time,old.callback_time),
+    nvl(date_format(nvl(new.callback_time,old.callback_time),'yyyy-MM-dd'),'9999-99-99')
+from
+(
+    select
+        id,
+        user_id,
+        order_id,
+        sku_id,
+        province_id,
+        trade_no,
+        out_trade_no,
+        payment_type,
+        refund_amount,
+        refund_status,
+        create_time,
+        callback_time
+    from ${APP}.dwd_refund_payment
+    where dt='9999-99-99'
+)old
+full outer join
+(
+    select
+        rp.id,
+        user_id,
+        order_id,
+        sku_id,
+        province_id,
+        trade_no,
+        out_trade_no,
+        payment_type,
+        refund_amount,
+        refund_status,
+        create_time,
+        callback_time
+    from
+    (
+        select
+            id,
+            out_trade_no,
+            order_id,
+            sku_id,
+            payment_type,
+            trade_no,
+            refund_amount,
+            refund_status,
+            create_time,
+            callback_time
+        from ${APP}.ods_refund_payment
+        where dt='$do_date'
+    )rp
+    left join
+    (
+        select
+            id,
+            user_id,
+            province_id
+        from ${APP}.ods_order_info
+        where dt='$do_date'
+    )oi
+    on rp.order_id=oi.id
+)new
+on old.id=new.id;"</span>
+strict<span class="token operator">=</span><span class="token string">"set hive.exec.dynamic.partition.mode=nonstrict"</span>
 <span class="token keyword">case</span> $<span class="token number">1</span> <span class="token operator">in</span>
-<span class="token string">"dim_user_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_user_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_sku_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_sku_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_base_province"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_base_province"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_coupon_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_coupon_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"dim_activity_rule_info"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_activity_rule_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"first"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_sku_info$dim_base_province$dim_coupon_info$dim_activity_rule_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
-<span class="token string">"all"</span><span class="token punctuation">)</span>{
-    hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dim_user_info$dim_sku_info$dim_coupon_info$dim_activity_rule_info"</span>
-}<span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_detail <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_detail"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_payment_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_payment_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_cart_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_cart_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_comment_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_comment_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_favor_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_favor_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_coupon_use <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_coupon_use"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_order_refund_info <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_order_refund_info"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    dwd_refund_payment <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$dwd_refund_payment"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
+    <span class="token keyword">all</span> <span class="token punctuation">)</span>
+        hive <span class="token operator">-</span><span class="token number">e</span> <span class="token string">"$strict$dwd_order_info$dwd_order_detail$dwd_payment_info$dwd_cart_info$dwd_comment_info$dwd_favor_info$dwd_coupon_use$dwd_order_refund_info$dwd_refund_payment"</span>
+    <span class="token punctuation">;</span><span class="token punctuation">;</span>
 esac
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -2650,7 +2753,7 @@ esac
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">29.4k</span>
+                        class="white-color">32.4k</span>
             
             
             
