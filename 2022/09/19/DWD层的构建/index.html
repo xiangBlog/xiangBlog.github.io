@@ -375,7 +375,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-21
+                    2022-09-23
                 </div>
                 
 
@@ -1899,7 +1899,7 @@ APP<span class="token operator">=</span>gmall
 fi
 
 dwd_order_info<span class="token operator">=</span><span class="token string">"
-insert overwrite table ${APP}.dwd_order_info partition(dt)
+insert overwrite table ${APP}.dwd_order_info partition(dt='$do_date')
 select
     nvl(new.id,old.id),
     nvl(new.order_status,old.order_status),
@@ -2753,7 +2753,7 @@ esac
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">50.1k</span>
+                        class="white-color">51.6k</span>
             
             
             
