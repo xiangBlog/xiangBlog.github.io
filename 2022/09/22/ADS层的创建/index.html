@@ -5,10 +5,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="ADS层的创建, 这几天心理颇不宁静">
-    <meta name="description" content="1. 访客主题2. 用户主题3. 商品主题3.1 商品统计该指标为商品综合统计，包含每个spu被下单总次数和被下单总金额。
-建表语句
-DROP TABLE IF EXISTS ads_order_spu_stats;
-CREATE EXTE">
+    <meta name="description" content="1. 访客主题1.1 访客统计1.2 路径分析2. 用户主题2.1 用户统计​	该需求为用户综合统计，其中包含若干指标，以下为对每个指标的解释说明。
+
+
+
+指标
+说明
+对应字段
+
+
+
+新增用户数
+统计新增注册用户人数
+new_user_co">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -342,21 +351,21 @@ CREATE EXTE">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-23
+                    2022-09-24
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.5k
+                    2.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    12 分
                 </div>
                 
 
@@ -381,7 +390,89 @@ CREATE EXTE">
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="1-访客主题"><a href="#1-访客主题" class="headerlink" title="1. 访客主题"></a>1. 访客主题</h2><h2 id="2-用户主题"><a href="#2-用户主题" class="headerlink" title="2. 用户主题"></a>2. 用户主题</h2><h2 id="3-商品主题"><a href="#3-商品主题" class="headerlink" title="3. 商品主题"></a>3. 商品主题</h2><h3 id="3-1-商品统计"><a href="#3-1-商品统计" class="headerlink" title="3.1 商品统计"></a>3.1 商品统计</h3><p>该指标为商品综合统计，包含每个spu被下单总次数和被下单总金额。</p>
+                <h2 id="1-访客主题"><a href="#1-访客主题" class="headerlink" title="1. 访客主题"></a>1. 访客主题</h2><h3 id="1-1-访客统计"><a href="#1-1-访客统计" class="headerlink" title="1.1 访客统计"></a>1.1 访客统计</h3><h3 id="1-2-路径分析"><a href="#1-2-路径分析" class="headerlink" title="1.2 路径分析"></a>1.2 路径分析</h3><h2 id="2-用户主题"><a href="#2-用户主题" class="headerlink" title="2. 用户主题"></a>2. 用户主题</h2><h3 id="2-1-用户统计"><a href="#2-1-用户统计" class="headerlink" title="2.1 用户统计"></a>2.1 用户统计</h3><p>​	该需求为用户综合统计，其中包含若干指标，以下为对每个指标的解释说明。</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>说明</th>
+<th>对应字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新增用户数</td>
+<td>统计新增注册用户人数</td>
+<td>new_user_count</td>
+</tr>
+<tr>
+<td>新增下单用户数</td>
+<td>统计新增下单用户人数</td>
+<td>new_order_user_count</td>
+</tr>
+<tr>
+<td>下单总金额</td>
+<td>统计所有订单总额</td>
+<td>order_final_amount</td>
+</tr>
+<tr>
+<td>下单用户数</td>
+<td>统计下单用户总数</td>
+<td>order_user_count</td>
+</tr>
+<tr>
+<td>未下单用户数</td>
+<td>统计活跃但未下单用户数</td>
+<td>no_order_user_count</td>
+</tr>
+</tbody></table>
+<p>建表语句</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ads_user_total<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>ads_user_total<span class="token punctuation">`</span> <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'统计日期'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>new_user_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'新注册用户数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>new_order_user_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'新增下单用户数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_final_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'下单总金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_user_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'下单用户数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>no_order_user_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'未下单用户数(具体指活跃用户中未下单用户)'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户统计'</span>
+    <span class="token keyword">ROW</span> FORMAT DELIMITED <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+    LOCATION <span class="token string">'/warehouse/gmall/ads/ads_user_total/'</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>数据装载</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> ads_user_total
+<span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ads_user_total
+<span class="token keyword">union</span>
+<span class="token keyword">select</span>
+    <span class="token string">'2022-09-04'</span><span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>login_date_first<span class="token operator">=</span><span class="token string">'2022-09-04'</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> new_user_count<span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>order_date_first<span class="token operator">=</span><span class="token string">'2022-09-04'</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> new_order_user_count<span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span>order_final_amount<span class="token punctuation">)</span> order_final_amount<span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>order_final_amount<span class="token operator">></span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> order_user_count<span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>login_date_last<span class="token operator">=</span><span class="token string">'2022-09-04'</span> <span class="token operator">and</span> order_final_amount<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> no_order_user_count
+<span class="token keyword">from</span> dwt_user_topic
+<span class="token keyword">where</span> dt<span class="token operator">=</span><span class="token string">'2022-09-04'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="2-2-用户变动统计"><a href="#2-2-用户变动统计" class="headerlink" title="2.2 用户变动统计"></a>2.2 用户变动统计</h3><p>​	该需求包括两个指标，分别为流失用户数和回流用户数，以下为对两个指标的解释说明。</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>说明</th>
+<th>对应字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流失用户数</td>
+<td>之前活跃过的用户，最近一段时间未活跃，就称为流失用户。此处要求统计7日前（只包含7日前当天）活跃，但最近7日未活跃的用户总数。</td>
+<td>user_churn_count</td>
+</tr>
+<tr>
+<td>回流用户数</td>
+<td>之前的活跃用户，一段时间未活跃（流失），今日又活跃了，就称为回流用户。次数要求统计回流用户总数。</td>
+<td>new_order_user_count</td>
+</tr>
+</tbody></table>
+<h3 id="2-3-用户行为漏斗分析"><a href="#2-3-用户行为漏斗分析" class="headerlink" title="2.3 用户行为漏斗分析"></a>2.3 用户行为漏斗分析</h3><h3 id="2-4-用户留存率"><a href="#2-4-用户留存率" class="headerlink" title="2.4 用户留存率"></a>2.4 用户留存率</h3><h3 id="2-5-七天内连续三天活跃用户"><a href="#2-5-七天内连续三天活跃用户" class="headerlink" title="2.5 七天内连续三天活跃用户"></a>2.5 七天内连续三天活跃用户</h3><h3 id="2-6-每分钟在线用户数"><a href="#2-6-每分钟在线用户数" class="headerlink" title="2.6 每分钟在线用户数"></a>2.6 每分钟在线用户数</h3><h2 id="3-商品主题"><a href="#3-商品主题" class="headerlink" title="3. 商品主题"></a>3. 商品主题</h2><h3 id="3-1-商品统计"><a href="#3-1-商品统计" class="headerlink" title="3.1 商品统计"></a>3.1 商品统计</h3><p>该指标为商品综合统计，包含每个spu被下单总次数和被下单总金额。</p>
 <p>建表语句</p>
 <pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ads_order_spu_stats<span class="token punctuation">;</span>
 <span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>ads_order_spu_stats<span class="token punctuation">`</span> <span class="token punctuation">(</span>
@@ -460,8 +551,7 @@ CREATE EXTE">
     LOCATION <span class="token string">'/warehouse/gmall/ads/ads_repeat_purchase/'</span><span class="token punctuation">;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>数据装载</p>
-<pre class="line-numbers language-sql"><code class="language-sql">
-<span class="token keyword">select</span>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">select</span>
     <span class="token string">'2022-09-04'</span> dt<span class="token punctuation">,</span>
     tm_id<span class="token punctuation">,</span>
     tm_name<span class="token punctuation">,</span>
@@ -494,19 +584,81 @@ CREATE EXTE">
             <span class="token keyword">group</span> <span class="token keyword">by</span> user_id<span class="token punctuation">,</span>tm_id<span class="token punctuation">,</span>tm_name
     <span class="token punctuation">)</span>t3
 <span class="token keyword">group</span> <span class="token keyword">by</span> tm_id<span class="token punctuation">,</span>tm_name
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="4-订单主题"><a href="#4-订单主题" class="headerlink" title="4. 订单主题"></a>4. 订单主题</h2><h3 id="4-1-订单统计"><a href="#4-1-订单统计" class="headerlink" title="4.1 订单统计"></a>4.1 订单统计</h3><p>建表语句</p>
-<pre class="line-numbers language-sql"><code class="language-sql">
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="4-订单主题"><a href="#4-订单主题" class="headerlink" title="4. 订单主题"></a>4. 订单主题</h2><p>​	该需求包含订单总数，订单总金额和下单总人数。</p>
+<h3 id="4-1-订单统计"><a href="#4-1-订单统计" class="headerlink" title="4.1 订单统计"></a>4.1 订单统计</h3><p>建表语句</p>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ads_order_total<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>ads_order_total<span class="token punctuation">`</span> <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'统计日期'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单金额'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_user_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'下单人数'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单统计'</span>
+    <span class="token keyword">ROW</span> FORMAT DELIMITED  <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+    LOCATION <span class="token string">'/warehouse/gmall/ads/ads_order_total/'</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>数据插入</p>
-<pre class="line-numbers language-sql"><code class="language-sql">
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> ads_order_total
+<span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ads_order_total
+<span class="token keyword">union</span>
+<span class="token keyword">select</span>
+    <span class="token string">'2022-09-04'</span><span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span>order_count<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span>order_final_amount<span class="token punctuation">)</span> order_final_amount<span class="token punctuation">,</span>
+    <span class="token function">sum</span><span class="token punctuation">(</span><span class="token keyword">if</span><span class="token punctuation">(</span>order_final_amount<span class="token operator">></span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span> order_user_count
+<span class="token keyword">from</span> dwt_user_topic
+<span class="token keyword">where</span> dt<span class="token operator">=</span><span class="token string">'2022-09-04'</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h3 id="4-2-各地区订单统计"><a href="#4-2-各地区订单统计" class="headerlink" title="4.2 各地区订单统计"></a>4.2 各地区订单统计</h3><p>建表语句</p>
-<pre class="line-numbers language-sql"><code class="language-sql">
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ads_order_by_province<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> EXTERNAL <span class="token keyword">TABLE</span> <span class="token punctuation">`</span>ads_order_by_province<span class="token punctuation">`</span> <span class="token punctuation">(</span>
+    <span class="token punctuation">`</span>dt<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'统计日期'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>province_id<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'省份id'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>province_name<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'省份名称'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>area_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'地区编码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>iso_code<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'国际标准地区编码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>iso_code_3166_2<span class="token punctuation">`</span> STRING <span class="token keyword">COMMENT</span> <span class="token string">'国际标准地区编码'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_count<span class="token punctuation">`</span> <span class="token keyword">BIGINT</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单数'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">`</span>order_amount<span class="token punctuation">`</span> <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'订单金额'</span>
+<span class="token punctuation">)</span> <span class="token keyword">COMMENT</span> <span class="token string">'用户留存率'</span>
+    <span class="token keyword">ROW</span> FORMAT DELIMITED  <span class="token keyword">FIELDS</span> <span class="token keyword">TERMINATED BY</span> <span class="token string">'\t'</span>
+    LOCATION <span class="token string">'/warehouse/gmall/ads/ads_order_by_province/'</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>数据导入</p>
 <pre class="line-numbers language-sql"><code class="language-sql">
-<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<span class="token keyword">insert</span> overwrite <span class="token keyword">table</span> ads_order_by_province
+<span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> ads_order_by_province
+<span class="token keyword">union</span>
+<span class="token keyword">select</span>
+    <span class="token string">'2022-09-04'</span> dt<span class="token punctuation">,</span>
+    province_id<span class="token punctuation">,</span>
+    province_name<span class="token punctuation">,</span>
+    area_code<span class="token punctuation">,</span>
+    iso_code<span class="token punctuation">,</span>
+    iso_3166_2<span class="token punctuation">,</span>
+    order_count<span class="token punctuation">,</span>
+    order_final_amount
+<span class="token keyword">from</span>
+    <span class="token punctuation">(</span>
+        <span class="token keyword">select</span>
+            province_id<span class="token punctuation">,</span>
+            order_count<span class="token punctuation">,</span>
+            order_final_amount
+        <span class="token keyword">from</span> dwt_area_topic
+        <span class="token keyword">where</span> dt<span class="token operator">=</span><span class="token string">'2022-09-04'</span>
+    <span class="token punctuation">)</span>t1
+        <span class="token keyword">left</span> <span class="token keyword">join</span>
+    <span class="token punctuation">(</span>
+        <span class="token keyword">select</span>
+            id<span class="token punctuation">,</span>
+            province_name<span class="token punctuation">,</span>
+            area_code<span class="token punctuation">,</span>
+            iso_code<span class="token punctuation">,</span>
+            iso_3166_2
+        <span class="token keyword">from</span> dim_base_province
+    <span class="token punctuation">)</span>t2
+    <span class="token keyword">on</span> t1<span class="token punctuation">.</span>province_id<span class="token operator">=</span>t2<span class="token punctuation">.</span>id<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="5-优惠券主题"><a href="#5-优惠券主题" class="headerlink" title="5.优惠券主题"></a>5.优惠券主题</h2><p>​	该需求要求统计最近7日发布的所有优惠券的领用情况和补贴率，补贴率是指，总优惠金额与使用优惠券的订单的原价金额的比值。</p>
 <p>建表语句</p>
 <pre class="line-numbers language-sql"><code class="language-sql"><span class="token keyword">DROP</span> <span class="token keyword">TABLE</span> <span class="token keyword">IF</span> <span class="token keyword">EXISTS</span> ads_coupon_stats<span class="token punctuation">;</span>
@@ -802,7 +954,67 @@ from
 )t3
 group by tm_id,tm_name;
 "</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+ads_order_total<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.ads_order_total
+select * from ${APP}.ads_order_total
+union
+select
+    '$do_date',
+    sum(order_count),
+    sum(order_final_amount) order_final_amount,
+    sum(if(order_final_amount>0,1,0)) order_user_count
+from ${APP}.dwt_user_topic
+where dt='$do_date';
+"</span>
+ads_order_by_province<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.ads_order_by_province
+select * from ${APP}.ads_order_by_province
+union
+select
+    '$do_date' dt,
+    province_id,
+    province_name,
+    area_code,
+    iso_code,
+    iso_3166_2,
+    order_count,
+    order_final_amount
+from
+(
+    select
+        province_id,
+        order_count,
+        order_final_amount
+    from ${APP}.dwt_area_topic
+    where dt='$do_date'
+)t1
+left join
+(
+    select
+        id,
+        province_name,
+        area_code,
+        iso_code,
+        iso_3166_2
+    from ${APP}.dim_base_province
+)t2
+on t1.province_id=t2.id;
+"</span>
+ads_user_total<span class="token operator">=</span><span class="token string">"
+insert overwrite table ${APP}.ads_user_total
+select * from ${APP}.ads_user_total
+union
+select
+    '$do_date',
+    sum(if(login_date_first='$do_date',1,0)) new_user_count,
+    sum(if(order_date_first='$do_date',1,0)) new_order_user_count,
+    sum(order_final_amount) order_final_amount,
+    sum(if(order_final_amount>0,1,0)) order_user_count,
+    sum(if(login_date_last='$do_date' and order_final_amount=0,1,0)) no_order_user_count
+from ${APP}.dwt_user_topic
+where dt='$do_date';
+"</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1177,7 +1389,7 @@ group by tm_id,tm_name;
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">51.6k</span>
+                        class="white-color">61.2k</span>
             
             
             
