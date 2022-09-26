@@ -5,7 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="Kylin部署, 这几天心理颇不宁静">
-    <meta name="description" content="">
+    <meta name="description" content="1. Kylin简介​	通过预计算来提高效率的框架，空间换时间的概念，把所有能计算的东西都计算出来形成一个很大的结果集，然后从结果集中取出数据从而加快查询效率
+1.1 Kylin定义​	Apache Kylin是一个开源的分布式分析引擎，提">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -305,12 +306,41 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Kylin/">
+                                <span class="chip bg-color">Kylin</span>
+                            </a>
+                        
+                            <a href="/tags/REST-API/">
+                                <span class="chip bg-color">REST API</span>
+                            </a>
+                        
+                            <a href="/tags/cube/">
+                                <span class="chip bg-color">cube</span>
+                            </a>
+                        
+                            <a href="/tags/cuboid/">
+                                <span class="chip bg-color">cuboid</span>
+                            </a>
+                        
+                            <a href="/tags/zepplin/">
+                                <span class="chip bg-color">zepplin</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93/" class="post-category">
+                                离线数仓
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -326,21 +356,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-09-26
+                    2022-09-27
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    0
+                    5.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    19 分
                 </div>
                 
 
@@ -365,7 +395,322 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h2 id="1-Kylin简介"><a href="#1-Kylin简介" class="headerlink" title="1. Kylin简介"></a>1. Kylin简介</h2><p>​	通过预计算来提高效率的框架，空间换时间的概念，把所有能计算的东西都计算出来形成一个很大的结果集，然后从结果集中取出数据从而加快查询效率</p>
+<h3 id="1-1-Kylin定义"><a href="#1-1-Kylin定义" class="headerlink" title="1.1 Kylin定义"></a>1.1 Kylin定义</h3><p>​	Apache Kylin是一个开源的分布式分析引擎，提供Hadoop&#x2F;Spark之上的SQL查询接口及多维分析（OLAP）能力以支持超大规模数据，最初由eBay Inc开发并贡献至开源社区。它能在亚秒内查询巨大的Hive表。</p>
+<h3 id="1-2-Kylin架构"><a href="#1-2-Kylin架构" class="headerlink" title="1.2 Kylin架构"></a>1.2 Kylin架构</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206470333.png" alt="1664206470333"></p>
+<p>1）REST Server</p>
+<p>​	REST Server是一套面向应用程序开发的入口点，旨在实现针对Kylin平台的应用开发工作。 此类应用程序可以提供查询、获取结果、触发cube构建任务、获取元数据以及获取用户权限等等。另外可以通过Restful接口实现SQL查询。</p>
+<p>2）查询引擎（Query Engine）</p>
+<p>​	当cube准备就绪后，查询引擎就能够获取并解析用户查询。它随后会与系统中的其它组件进行交互，从而向用户返回对应的结果。 </p>
+<p>3）路由器（Routing）</p>
+<p>​	在最初设计时曾考虑过将Kylin不能执行的查询引导去Hive中继续执行，但在实践后发现Hive与Kylin的速度差异过大，导致用户无法对查询的速度有一致的期望，很可能大多数查询几秒内就返回结果了，而有些查询则要等几分钟到几十分钟，因此体验非常糟糕。最后这个路由功能在发行版中默认关闭。</p>
+<p>4）元数据管理工具（Metadata）</p>
+<p>​	Kylin是一款元数据驱动型应用程序。元数据管理工具是一大关键性组件，用于对保存在Kylin当中的所有元数据进行管理，其中包括最为重要的cube元数据。其它全部组件的正常运作都需以元数据管理工具为基础。 Kylin的元数据存储在hbase中。 </p>
+<p>5）任务引擎（Cube Build Engine）</p>
+<p>​	这套引擎的设计目的在于处理所有离线任务，其中包括shell脚本、Java API以及Map Reduce任务等等。任务引擎对Kylin当中的全部任务加以管理与协调，从而确保每一项任务都能得到切实执行并解决其间出现的故障。</p>
+<h3 id="1-3-Kylin特点"><a href="#1-3-Kylin特点" class="headerlink" title="1.3 Kylin特点"></a>1.3 Kylin特点</h3><p>​	Kylin的主要特点包括支持SQL接口、支持超大规模数据集、亚秒级响应、可伸缩性、高吞吐率、BI工具集成等。</p>
+<p>1）标准SQL接口：Kylin是以标准的SQL作为对外服务的接口。</p>
+<p>2）支持超大数据集：Kylin对于大数据的支撑能力可能是目前所有技术中最为领先的。早在2015年eBay的生产环境中就能支持百亿记录的秒级查询，之后在移动的应用场景中又有了千亿记录秒级查询的案例。</p>
+<p>3）亚秒级响应：Kylin拥有优异的查询相应速度，这点得益于预计算，很多复杂的计算，比如连接、聚合，在离线的预计算过程中就已经完成，这大大降低了查询时刻所需的计算量，提高了响应速度。</p>
+<p>4）可伸缩性和高吞吐率：单节点Kylin可实现每秒70个查询，还可以搭建Kylin的集群。</p>
+<p>5）BI工具集成</p>
+<p>​	Kylin可以与现有的BI工具集成，具体包括如下内容。</p>
+<p>​	ODBC：与Tableau、Excel、PowerBI等工具集成</p>
+<p>​	JDBC：与Saiku、BIRT等Java工具集成</p>
+<p>​	RestAPI：与JavaScript、Web网页集成</p>
+<p>Kylin开发团队还贡献了<strong>Zepplin</strong>的插件，也可以使用Zepplin来访问Kylin服务。</p>
+<h2 id="2-Kylin安装"><a href="#2-Kylin安装" class="headerlink" title="2. Kylin安装"></a>2. Kylin安装</h2><h3 id="2-1-Kylin依赖环境"><a href="#2-1-Kylin依赖环境" class="headerlink" title="2.1 Kylin依赖环境"></a>2.1 Kylin依赖环境</h3><p>​	安装Kylin前需先部署好Hadoop、Hive、Zookeeper、HBase，并且需要在&#x2F;etc&#x2F;profile中配置以下环境变量HADOOP_HOME，HIVE_HOME，HBASE_HOME，记得source使其生效。</p>
+<h3 id="2-2-Kylin搭建"><a href="#2-2-Kylin搭建" class="headerlink" title="2.2 Kylin搭建"></a>2.2 Kylin搭建</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206587490.png" alt="1664206587490"></p>
+<h3 id="2-3-Kylin兼容问题"><a href="#2-3-Kylin兼容问题" class="headerlink" title="2.3 Kylin兼容问题"></a>2.3 Kylin兼容问题</h3><p>修改&#x2F;opt&#x2F;module&#x2F;kylin&#x2F;bin&#x2F;find-spark-dependency.sh，排除冲突的jar包</p>
+<p>需要增加的内容：**! -name ‘*jackson*‘ ! -name ‘*metastore*‘**</p>
+<p>注意前后保留空格</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206618074.png" alt="1664206618074"></p>
+<h3 id="2-4-Kylin启动"><a href="#2-4-Kylin启动" class="headerlink" title="2.4 Kylin启动"></a>2.4 Kylin启动</h3><p>（1）启动Kylin之前，需先启动Hadoop（hdfs，yarn，jobhistoryserver）、Zookeeper、Hbase</p>
+<p>（2）启动Kylin</p>
+<pre class="line-numbers language-shell"><code class="language-shell">[atguigu@hadoop102 kylin]$ bin/kylin.sh start
+启动之后查看各个节点进程：
+--------------------- hadoop102 ----------------
+3360 JobHistoryServer
+31425 HMaster
+3282 NodeManager
+3026 DataNode
+53283 Jps
+2886 NameNode
+44007 RunJar
+2728 QuorumPeerMain
+31566 HRegionServer
+--------------------- hadoop103 ----------------
+5040 HMaster
+2864 ResourceManager
+9729 Jps
+2657 QuorumPeerMain
+4946 HRegionServer
+2979 NodeManager
+2727 DataNode
+--------------------- hadoop104 ----------------
+4688 HRegionServer
+2900 NodeManager
+9848 Jps
+2636 QuorumPeerMain
+2700 DataNode
+2815 SecondaryNameNode
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在<a target="_blank" rel="noopener" href="http://hadoop102:7070/kylin">http://hadoop102:7070/kylin</a>查看Web页面</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206682639.png" alt="1664206682639"></p>
+<h2 id="3-Kylin使用"><a href="#3-Kylin使用" class="headerlink" title="3. Kylin使用"></a>3. Kylin使用</h2><p>​	以gmall数据仓库中的dwd_order_detail作为事实表，dim_user_info、dim_sku_info、dim_base_province作为维度表，构建星型模型，并演示如何使用Kylin进行OLAP分析。</p>
+<h3 id="3-1-创建工程"><a href="#3-1-创建工程" class="headerlink" title="3.1 创建工程"></a>3.1 创建工程</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206728139.png" alt="1664206728139"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206733704.png" alt="1664206733704"></p>
+<h3 id="3-2-获取数据源"><a href="#3-2-获取数据源" class="headerlink" title="3.2 获取数据源"></a>3.2 获取数据源</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206746422.png" alt="1664206746422"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206752587.png" alt="1664206752587"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206763651.png" alt="1664206763651"></p>
+<p><strong>注意事项</strong>：</p>
+<p>Kylin不能处理Hive表中的复杂数据类型（Array,Map,Struct）,即便复杂类型的字段并未参与到计算之中。故在加载Hive数据源时，不能直接加载带有复杂数据类型字段的表。而在dim_sku_info表中存在两个复杂数据类型的字段（平台属性和销售属性），故dim_sku_info不能直接加载，需对其进行以下处理。</p>
+<p>（1）在hive客户端创建一个视图，如下。该视图已经将dim_sku_info表中的复杂数据类型的字段去掉，在后续的计算中，不再使用dim_sku_info，而使用dim_sku_info_view。</p>
+<pre class="line-numbers language-sql"><code class="language-sql">hive <span class="token punctuation">(</span>gmall<span class="token punctuation">)</span><span class="token operator">></span>
+<span class="token keyword">create</span> <span class="token keyword">view</span> dim_sku_info_view
+<span class="token keyword">as</span>
+<span class="token keyword">select</span>
+    id<span class="token punctuation">,</span>
+    price<span class="token punctuation">,</span>
+    sku_name<span class="token punctuation">,</span>
+    sku_desc<span class="token punctuation">,</span>
+    weight<span class="token punctuation">,</span>
+    is_sale<span class="token punctuation">,</span>
+    spu_id<span class="token punctuation">,</span>
+    spu_name<span class="token punctuation">,</span>
+    category3_id<span class="token punctuation">,</span>
+    category3_name<span class="token punctuation">,</span>
+    category2_id<span class="token punctuation">,</span>
+    category2_name<span class="token punctuation">,</span>
+    category1_id<span class="token punctuation">,</span>
+    category1_name<span class="token punctuation">,</span>
+    tm_id<span class="token punctuation">,</span>
+    tm_name<span class="token punctuation">,</span>
+    create_time
+<span class="token keyword">from</span> dim_sku_info<span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>（2）在kylin中重新导入dim_sku_info_view视图</p>
+<h3 id="3-3-创建model"><a href="#3-3-创建model" class="headerlink" title="3.3 创建model"></a>3.3 创建model</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206814468.png" alt="1664206814468"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206823748.png" alt="1664206823748"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206828769.png" alt="1664206828769"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206834158.png" alt="1664206834158"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206844075.png" alt="1664206844075"><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206848920.png" alt="1664206848920"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206856272.png" alt="1664206856272"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206863218.png" alt="1664206863218"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206869205.png" alt="1664206869205"></p>
+<h3 id="3-4-创建cube"><a href="#3-4-创建cube" class="headerlink" title="3.4 创建cube"></a>3.4 创建cube</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206895321.png" alt="1664206895321"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206899878.png" alt="1664206899878"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206952108.png" alt="1664206952108"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206964030.png" alt="1664206964030"></p>
+<p>选择度量值</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206971102.png" alt="1664206971102"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664206996610.png" alt="1664206996610"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207016082.png" alt="1664207016082"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207025557.png" alt="1664207025557"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207031586.png" alt="1664207031586"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207037772.png" alt="1664207037772"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207044184.png" alt="1664207044184"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207049241.png" alt="1664207049241"></p>
+<h3 id="3-5-使用进阶"><a href="#3-5-使用进阶" class="headerlink" title="3.5 使用进阶"></a>3.5 使用进阶</h3><p>每日全量维度表及拉链维度表重复Key问题如何处理</p>
+<p>按照上述流程，会发现，在cube构建流程中出现以下错误</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207108676.png" alt="1664207108676"></p>
+<p>错误原因分析：</p>
+<p>上述错误原因是model中的维度表dim_user_info为拉链表、dim_sku_info（dim_sku_info_view）为每日全量表，故使用整张表作为维度表，必然会出现订单明细表中同一个user_id或者sku_id对应多条数据的问题，针对上述问题，有以下解决方案。</p>
+<p>在hive客户端为拉链表以及每日全量维度表创建视图，在创建视图时对数据加以过滤，保证从视图中查出的数据是一份全量最新的数据即可。</p>
+<ol>
+<li>创建维度表视图</li>
+</ol>
+<pre class="line-numbers language-sql"><code class="language-sql"><span class="token comment" spellcheck="true">--拉链维度表视图</span>
+<span class="token keyword">create</span> <span class="token keyword">view</span> dim_user_info_view <span class="token keyword">as</span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> dim_user_info <span class="token keyword">where</span> dt<span class="token operator">=</span><span class="token string">'9999-99-99'</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">--全量维度表视图（注意排除复杂数据类型字段）</span>
+<span class="token keyword">create</span> <span class="token keyword">view</span> dim_sku_info_view
+<span class="token keyword">as</span>
+<span class="token keyword">select</span>
+    id<span class="token punctuation">,</span>
+    price<span class="token punctuation">,</span>
+    sku_name<span class="token punctuation">,</span>
+    sku_desc<span class="token punctuation">,</span>
+    weight<span class="token punctuation">,</span>
+    is_sale<span class="token punctuation">,</span>
+    spu_id<span class="token punctuation">,</span>
+    spu_name<span class="token punctuation">,</span>
+    category3_id<span class="token punctuation">,</span>
+    category3_name<span class="token punctuation">,</span>
+    category2_id<span class="token punctuation">,</span>
+    category2_name<span class="token punctuation">,</span>
+    category1_id<span class="token punctuation">,</span>
+    category1_name<span class="token punctuation">,</span>
+    tm_id<span class="token punctuation">,</span>
+    tm_name<span class="token punctuation">,</span>
+    create_time
+<span class="token keyword">from</span> dim_sku_info
+<span class="token keyword">where</span> dt<span class="token operator">=</span>date_add<span class="token punctuation">(</span><span class="token keyword">current_date</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">--当前情形我们先创建一个2020-06-15的视图，由于之前已经创建了dim_sku_info_view，故无需重新创建，修改之前的视图即可。</span>
+<span class="token keyword">alter</span> <span class="token keyword">view</span> dim_sku_info_view
+<span class="token keyword">as</span>
+<span class="token keyword">select</span>
+    id<span class="token punctuation">,</span>
+    price<span class="token punctuation">,</span>
+    sku_name<span class="token punctuation">,</span>
+    sku_desc<span class="token punctuation">,</span>
+    weight<span class="token punctuation">,</span>
+    is_sale<span class="token punctuation">,</span>
+    spu_id<span class="token punctuation">,</span>
+    spu_name<span class="token punctuation">,</span>
+    category3_id<span class="token punctuation">,</span>
+    category3_name<span class="token punctuation">,</span>
+    category2_id<span class="token punctuation">,</span>
+    category2_name<span class="token punctuation">,</span>
+    category1_id<span class="token punctuation">,</span>
+    category1_name<span class="token punctuation">,</span>
+    tm_id<span class="token punctuation">,</span>
+    tm_name<span class="token punctuation">,</span>
+    create_time
+<span class="token keyword">from</span> dim_sku_info
+<span class="token keyword">where</span> dt<span class="token operator">=</span><span class="token string">'2020-06-15'</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ol start="2">
+<li><p>在DataSource中导入新创建的视图，之前的维度表，可选择性删除。</p>
+</li>
+<li><p>重新创建model、cube。</p>
+</li>
+</ol>
+<h2 id="4-Kylin-Cube构建原理"><a href="#4-Kylin-Cube构建原理" class="headerlink" title="4. Kylin Cube构建原理"></a>4. Kylin Cube构建原理</h2><h3 id="4-1-维度和度量"><a href="#4-1-维度和度量" class="headerlink" title="4.1 维度和度量"></a>4.1 维度和度量</h3><p>​	维度：即观察数据的角度。比如员工数据，可以从性别角度来分析，也可以更加细化，从入职时间或者地区的维度来观察。维度是一组离散的值，比如说性别中的男和女，或者时间维度上的每一个独立的日期。因此在统计时可以将维度值相同的记录聚合在一起，然后应用聚合函数做累加、平均、最大和最小值等聚合计算。</p>
+<p>​	度量：即被聚合（观察）的统计值，也就是聚合运算的结果。</p>
+<p>比如说员工数据中不同性别员工的人数，又或者说在同一年入职的员工有多少。</p>
+<h3 id="4-2-Cube-和Cuboid"><a href="#4-2-Cube-和Cuboid" class="headerlink" title="4.2 Cube 和Cuboid"></a>4.2 Cube 和Cuboid</h3><p>​	有了维度跟度量，一个数据表或者数据模型上的所有字段就可以分类了，它们要么是维度，要么是度量（可以被聚合）。于是就有了根据维度和度量做预计算的Cube理论。</p>
+<p>​	给定一个数据模型，我们可以对其上的所有维度进行聚合，对于N个维度来说，组合&#96;的所有可能性共有2n种。对于每一种维度的组合，将度量值做聚合计算，然后将结果保存为一个物化视图，称为Cuboid。所有维度组合的Cuboid作为一个整体，称为Cube。</p>
+<p>​	下面举一个简单的例子说明，假设有一个电商的销售数据集，其中维度包括时间[time]、商品[item]、地区[location]和供应商[supplier]，度量为销售额。那么所有维度的组合就有24 &#x3D; 16种，如下图所示：</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207261514.png" alt="1664207261514"></p>
+<p>一维度（1D）的组合有：[time]、[item]、[location]和[supplier]4种；</p>
+<p>二维度（2D）的组合有：[time, item]、[time, location]、[time, supplier]、[item, location]、[item, supplier]、[location, supplier]3种；</p>
+<p>三维度（3D）的组合也有4种；</p>
+<p>最后还有零维度（0D）和四维度（4D）各有一种，总共16种。</p>
+<p>注意：每一种维度组合就是一个Cuboid，16个Cuboid整体就是一个Cube。</p>
+<h3 id="4-3-Cube构建算法"><a href="#4-3-Cube构建算法" class="headerlink" title="4.3 Cube构建算法"></a>4.3 Cube构建算法</h3><p><strong>逐层构建算法</strong></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207298768.png" alt="1664207298768"></p>
+<p>​	我们知道，一个N维的Cube，是由1个N维子立方体、N个(N-1)维子立方体、N*(N-1)&#x2F;2个(N-2)维子立方体、……、N个1维子立方体和1个0维子立方体构成，总共有2^N个子立方体组成，在逐层算法中，按维度数逐层减少来计算，每个层级的计算（除了第一层，它是从原始数据聚合而来），是基于它上一层级的结果来计算的。比如，[Group by A, B]的结果，可以基于[Group by A, B, C]的结果，通过去掉C后聚合得来的；这样可以减少重复计算；当 0维度Cuboid计算出来的时候，整个Cube的计算也就完成了。</p>
+<p>​	<strong>每一轮的计算都是一个MapReduce任务，且串行执行；一个N维的Cube，至少需要N次MapReduce Job。</strong>	<img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207343334.png" alt="1664207343334"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664203400793.png" alt="1664203400793"></p>
+<p><strong>算法优点：</strong></p>
+<p>​	1）此算法充分利用了MapReduce的优点，处理了中间复杂的排序和shuffle工作，故而算法代码清晰简单，易于维护；</p>
+<p>​	2）受益于Hadoop的日趋成熟，此算法非常稳定，即便是集群资源紧张时，也能保证最终能够完成。</p>
+<p><strong>算法缺点：</strong></p>
+<p>​	1）当Cube有比较多维度的时候，所需要的MapReduce任务也相应增加；由于Hadoop的任务调度需要耗费额外资源，特别是集群较庞大的时候，反复递交任务造成的额外开销会相当可观；</p>
+<p>​	2）由于Mapper逻辑中并未进行聚合操作，所以每轮MR的shuffle工作量都很大，导致效率低下。</p>
+<p>​	3）对HDFS的读写操作较多：由于每一层计算的输出会用做下一层计算的输入，这些Key-Value需要写到HDFS上；当所有计算都完成后，Kylin还需要额外的一轮任务将这些文件转成HBase的HFile格式，以导入到HBase中去；</p>
+<p>​	总体而言，该算法的效率较低，尤其是当Cube维度数较大的时候。</p>
+<hr>
+<p><strong>快速构建算法（inmem）</strong></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207394035.png" alt="1664207394035"></p>
+<p>​	也被称作“逐段”(By Segment) 或“逐块”(By Split) 算法，从1.5.x开始引入该算法，该算法的主要思想是，每个Mapper将其所分配到的数据块，计算成一个完整的小Cube 段（包含所有Cuboid）。每个Mapper将计算完的Cube段输出给Reducer做合并，生成大Cube，也就是最终结果。如图所示解释了此流程。</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207414415.png" alt="1664207414415"></p>
+<p><strong>与旧算法相比，快速算法主要有两点不同：</strong></p>
+<p>​	1） Mapper会利用内存做预聚合，算出所有组合；Mapper输出的每个Key都是不同的，这样会减少输出到Hadoop MapReduce的数据量，Combiner也不再需要；</p>
+<p>​	2）一轮MapReduce便会完成所有层次的计算，减少Hadoop任务的调配。</p>
+<h3 id="4-4-Cube存储原理"><a href="#4-4-Cube存储原理" class="headerlink" title="4.4 Cube存储原理"></a>4.4 Cube存储原理</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207452931.png" alt="1664207452931"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207460558.png" alt="1664207460558"></p>
+<h2 id="5-Kylin-Cube构建优化"><a href="#5-Kylin-Cube构建优化" class="headerlink" title="5. Kylin Cube构建优化"></a>5. Kylin Cube构建优化</h2><h3 id="5-1-使用衍生维度（derived-dimension）"><a href="#5-1-使用衍生维度（derived-dimension）" class="headerlink" title="5.1 使用衍生维度（derived dimension）"></a>5.1 使用衍生维度（derived dimension）</h3><p>​	衍生维度用于在有效维度内将维度表上的非主键维度排除掉，并使用维度表的主键（其实是事实表上相应的外键）来替代它们。Kylin会在底层记录维度表主键与维度表其他维度之间的映射关系，以便在查询时能够动态地将维度表的主键“翻译”成这些非主键维度，并进行实时聚合。</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207619219.png" alt="1664207619219"></p>
+<p>​	虽然衍生维度具有非常大的吸引力，但这也并不是说所有维度表上的维度都得变成衍生维度，如果从维度表主键到某个维度表维度所需要的聚合工作量非常大，则不建议使用衍生维度。</p>
+<h3 id="5-2-使用聚合组（Aggregation-Group）"><a href="#5-2-使用聚合组（Aggregation-Group）" class="headerlink" title="5.2 使用聚合组（Aggregation Group）"></a>5.2 使用聚合组（Aggregation Group）</h3><p>​	聚合组（Aggregation Group）是一种强大的剪枝工具。聚合组假设一个Cube的所有维度均可以根据业务需求划分成若干组（当然也可以是一个组），由于同一个组内的维度更可能同时被同一个查询用到，因此会表现出更加紧密的内在关联。每个分组的维度集合均是Cube所有维度的一个子集，不同的分组各自拥有一套维度集合，它们可能与其他分组有相同的维度，也可能没有相同的维度。每个分组各自独立地根据自身的规则贡献出一批需要被物化的Cuboid，所有分组贡献的Cuboid的并集就成为了当前Cube中所有需要物化的Cuboid的集合。不同的分组有可能会贡献出相同的Cuboid，构建引擎会察觉到这点，并且保证每一个Cuboid无论在多少个分组中出现，它都只会被物化一次。</p>
+<p>​	对于每个分组内部的维度，用户可以使用如下三种可选的方式定义，它们之间的关系，具体如下。</p>
+<ol>
+<li>强制维度（Mandatory），如果一个维度被定义为强制维度，那么这个分组产生的所有Cuboid中每一个Cuboid都会包含该维度。每个分组中都可以有0个、1个或多个强制维度。如果根据这个分组的业务逻辑，则相关的查询一定会在过滤条件或分组条件中，因此可以在该分组中把该维度设置为强制维度。</li>
+</ol>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207677497.png" alt="1664207677497"></p>
+<ol start="2">
+<li>层级维度（Hierarchy），每个层级包含两个或更多个维度。假设一个层级中包含D1，D2…Dn这n个维度，那么在该分组产生的任何Cuboid中， 这n个维度只会以（），（D1），（D1，D2）…（D1，D2…Dn）这n+1种形式中的一种出现。每个分组中可以有0个、1个或多个层级，不同的层级之间不应当有共享的维度。如果根据这个分组的业务逻辑，则多个维度直接存在层级关系，因此可以在该分组中把这些维度设置为层级维度。</li>
+</ol>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207693260.png" alt="1664207693260"></p>
+<ol start="3">
+<li>联合维度（Joint），每个联合中包含两个或更多个维度，如果某些列形成一个联合，那么在该分组产生的任何Cuboid中，这些联合维度要么一起出现，要么都不出现。每个分组中可以有0个或多个联合，但是不同的联合之间不应当有共享的维度（否则它们可以合并成一个联合）。如果根据这个分组的业务逻辑，多个维度在查询中总是同时出现，则可以在该分组中把这些维度设置为联合维度。</li>
+</ol>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207716047.png" alt="1664207716047"></p>
+<p>​	这些操作可以在Cube Designer的Advanced Setting中的Aggregation Groups区域完成，如下图所示。</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207735359.png" alt="1664207735359"></p>
+<p>​	聚合组的设计非常灵活，甚至可以用来描述一些极端的设计。假设我们的业务需求非常单一，只需要某些特定的Cuboid，那么可以创建多个聚合组，每个聚合组代表一个Cuboid。具体的方法是在聚合组中先包含某个Cuboid所需的所有维度，然后把这些维度都设置为强制维度。这样当前的聚合组就只能产生我们想要的那一个Cuboid了。</p>
+<p>​	再比如，有的时候我们的Cube中有一些基数非常大的维度，如果不做特殊处理，它就会和其他的维度进行各种组合，从而产生一大堆包含它的Cuboid。包含高基数维度的Cuboid在行数和体积上往往非常庞大，这会导致整个Cube的膨胀率变大。如果根据业务需求知道这个高基数的维度只会与若干个维度（而不是所有维度）同时被查询到，那么就可以通过聚合组对这个高基数维度做一定的“隔离”。我们把这个高基数的维度放入一个单独的聚合组，再把所有可能会与这个高基数维度一起被查询到的其他维度也放进来。这样，这个高基数的维度就被“隔离”在一个聚合组中了，所有不会与它一起被查询到的维度都没有和它一起出现在任何一个分组中，因此也就不会有多余的Cuboid产生。这点也大大减少了包含该高基数维度的Cuboid的数量，可以有效地控制Cube的膨胀率。</p>
+<h3 id="5-3-Row-key优化"><a href="#5-3-Row-key优化" class="headerlink" title="5.3 Row key优化"></a>5.3 Row key优化</h3><p>​	Kylin会把所有的维度按照顺序组合成一个完整的Rowkey，并且按照这个Rowkey升序排列Cuboid中所有的行。</p>
+<p>​	设计良好的Rowkey将更有效地完成数据的查询过滤和定位，减少IO次数，提高查询速度，维度在rowkey中的次序，对查询性能有显著的影响。</p>
+<p><strong>Row key的设计原则如下：</strong></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207788532.png" alt="1664207788532"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207871016.png" alt="1664207871016"></p>
+<h3 id="5-4-并发粒度优化"><a href="#5-4-并发粒度优化" class="headerlink" title="5.4 并发粒度优化"></a>5.4 并发粒度优化</h3><p>​	当Segment中某一个Cuboid的大小超出一定的阈值时，系统会将该Cuboid的数据分片到多个分区中，以实现Cuboid数据读取的并行化，从而优化Cube的查询速度。具体的实现方式如下：构建引擎根据Segment估计的大小，以及参数“kylin.hbase.region.cut”的设置决定Segment在存储引擎中总共需要几个分区来存储，如果存储引擎是HBase，那么分区的数量就对应于HBase中的Region数量。kylin.hbase.region.cut的默认值是5.0，单位是GB，也就是说对于一个大小估计是50GB的Segment，构建引擎会给它分配10个分区。用户还可以通过设置kylin.hbase.region.count.min（默认为1）和kylin.hbase.region.count.max（默认为500）两个配置来决定每个Segment最少或最多被划分成多少个分区。	</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664207899132.png" alt="1664207899132"></p>
+<p>​	由于每个Cube的并发粒度控制不尽相同，因此建议在Cube Designer 的Configuration Overwrites（上图所示）中为每个Cube量身定制控制并发粒度的参数。假设将把当前Cube的kylin.hbase.region.count.min设置为2，kylin.hbase.region.count.max设置为100。这样无论Segment的大小如何变化，它的分区数量最小都不会低于2，最大都不会超过100。相应地，这个Segment背后的存储引擎（HBase）为了存储这个Segment，也不会使用小于两个或超过100个的分区。我们还调整了默认的kylin.hbase.region.cut，这样50GB的Segment基本上会被分配到50个分区，相比默认设置，我们的Cuboid可能最多会获得5倍的并发量。</p>
+<h2 id="6-Kylin-BI-工具集成"><a href="#6-Kylin-BI-工具集成" class="headerlink" title="6. Kylin BI 工具集成"></a>6. Kylin BI 工具集成</h2><p>可以与Kylin结合使用的可视化工具很多，例如：</p>
+<p>ODBC：与Tableau、Excel、PowerBI等工具集成</p>
+<p>JDBC：与Saiku、BIRT等Java工具集成</p>
+<p>RestAPI：与JavaScript、Web网页集成</p>
+<p>Kylin开发团队还贡献了Zepplin的插件，也可以使用Zepplin来访问Kylin服务。</p>
+<h3 id="6-1-JDBC"><a href="#6-1-JDBC" class="headerlink" title="6.1 JDBC"></a>6.1 JDBC</h3><p>依赖</p>
+<pre class="line-numbers language-xml"><code class="language-xml">    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.kylin<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>kylin-jdbc<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>3.0.2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">></span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>代码</p>
+<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>atguigu<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> java<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>*<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestKylin</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+
+        <span class="token comment" spellcheck="true">//Kylin_JDBC 驱动</span>
+        String KYLIN_DRIVER <span class="token operator">=</span> <span class="token string">"org.apache.kylin.jdbc.Driver"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//Kylin_URL</span>
+        String KYLIN_URL <span class="token operator">=</span> <span class="token string">"jdbc:kylin://hadoop102:7070/FirstProject"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//Kylin的用户名</span>
+        String KYLIN_USER <span class="token operator">=</span> <span class="token string">"ADMIN"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//Kylin的密码</span>
+        String KYLIN_PASSWD <span class="token operator">=</span> <span class="token string">"KYLIN"</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//添加驱动信息</span>
+        Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>KYLIN_DRIVER<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//获取连接</span>
+        Connection connection <span class="token operator">=</span> DriverManager<span class="token punctuation">.</span><span class="token function">getConnection</span><span class="token punctuation">(</span>KYLIN_URL<span class="token punctuation">,</span> KYLIN_USER<span class="token punctuation">,</span> KYLIN_PASSWD<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//预编译SQL</span>
+        PreparedStatement ps <span class="token operator">=</span> connection<span class="token punctuation">.</span><span class="token function">prepareStatement</span><span class="token punctuation">(</span><span class="token string">"SELECT sum(sal) FROM emp group by deptno"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//执行查询</span>
+        ResultSet resultSet <span class="token operator">=</span> ps<span class="token punctuation">.</span><span class="token function">executeQuery</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//遍历打印</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>resultSet<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>resultSet<span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>结果</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208025031.png" alt="1664208025031"></p>
+<h3 id="6-2-Zepplin"><a href="#6-2-Zepplin" class="headerlink" title="6.2 Zepplin"></a>6.2 Zepplin</h3><p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208042859.png" alt="1664208042859"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208050762.png" alt="1664208050762"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208061080.png" alt="1664208061080"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208071115.png" alt="1664208071115"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208081210.png" alt="1664208081210"></p>
+<p>需求：查询员工详细信息，并使用各种图表进行展示</p>
+<p>（1）点击Notebook创建新的note</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208103864.png" alt="1664208103864"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208112709.png" alt="1664208112709"></p>
+<p>​	（3）执行查询</p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208138847.png" alt="1664208138847"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208145825.png" alt="1664208145825"></p>
+<p><img src="/2022/09/26/Kylin%E9%83%A8%E7%BD%B2/1664208154602.png" alt="1664208154602"></p>
+
                 
             </div>
             <hr/>
@@ -428,7 +773,27 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/Kylin/">
+                                    <span class="chip bg-color">Kylin</span>
+                                </a>
+                            
+                                <a href="/tags/REST-API/">
+                                    <span class="chip bg-color">REST API</span>
+                                </a>
+                            
+                                <a href="/tags/cube/">
+                                    <span class="chip bg-color">cube</span>
+                                </a>
+                            
+                                <a href="/tags/cuboid/">
+                                    <span class="chip bg-color">cuboid</span>
+                                </a>
+                            
+                                <a href="/tags/zepplin/">
+                                    <span class="chip bg-color">zepplin</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -531,13 +896,41 @@
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Xiang Liu
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%A6%BB%E7%BA%BF%E6%95%B0%E4%BB%93/" class="post-category">
+                                    离线数仓
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
 
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Kylin/">
+                        <span class="chip bg-color">Kylin</span>
+                    </a>
+                    
+                    <a href="/tags/REST-API/">
+                        <span class="chip bg-color">REST API</span>
+                    </a>
+                    
+                    <a href="/tags/cube/">
+                        <span class="chip bg-color">cube</span>
+                    </a>
+                    
+                    <a href="/tags/cuboid/">
+                        <span class="chip bg-color">cuboid</span>
+                    </a>
+                    
+                    <a href="/tags/zepplin/">
+                        <span class="chip bg-color">zepplin</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
@@ -723,7 +1116,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">69k</span>
+                        class="white-color">74.2k</span>
             
             
             
